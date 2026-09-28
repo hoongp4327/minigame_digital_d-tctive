@@ -1,0 +1,59 @@
+# Cấu hình deploy Netlify cho Digital Detective.
+# Dự án là web tĩnh thuần: KHÔNG có bước build, không cần Node ở phía Netlify.
+
+[build]
+  # Nội dung thư mục gốc chính là bản deploy.
+  publish = "."
+  # Để trống: không chạy build command nào cả.
+  command = ""
+
+[build.processing]
+  # App đã tự tối ưu; để Netlify xử lý lại có thể làm hỏng SVG và thứ tự CSS.
+  skip_processing = true
+
+# ---------------------------------------------------------------------------
+# Cache
+# ---------------------------------------------------------------------------
+
+# Service worker phải luôn được kiểm tra lại, nếu không iPad sẽ kẹt ở bản cũ
+# sau khi bạn phát hành bản mới.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Trang chính cũng không cache, để bản build mới có hiệu lực ngay.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Font có tên chứa hash của Google Fonts nên cache dài vô tư.
+[[headers]]
+  for = "/assets/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# CSS, JS và hình: cache 1 ngày, vẫn revalidate để sửa nội dung câu hỏi
+# không phải chờ lâu mới thấy trên iPad.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, must-revalidate"
+
+[[headers]]
+  for = "/src/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, must-revalidate"
+
+# ---------------------------------------------------------------------------
+# Header chung
+# ---------------------------------------------------------------------------
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # App không nhúng iframe và không nhận nội dung ngoài.
+    X-Frame-Options = "SAMEORIGIN"
