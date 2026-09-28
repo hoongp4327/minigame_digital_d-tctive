@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Digital Detective — Kiểm thử logic phiên chơi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font: 16px/1.6 -apple-system, 'Segoe UI', sans-serif; color: #10243A;
+           background: #F6F3EB; margin: 0; padding: 32px; }
+    h1 { font-size: 24px; margin: 0 0 4px; }
+    p.sub { color: #5F6B76; margin: 0 0 24px; }
+    table { border-collapse: collapse; width: 100%; max-width: 900px; background: #fff;
+            border: 1px solid #D8DEE4; border-radius: 12px; overflow: hidden; }
+    th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid #EDF1F4; vertical-align: top; }
+    th { background: #10243A; color: #fff; font-size: 14px; letter-spacing: .4px; }
+    tr:last-child td { border-bottom: none; }
+    .ok { color: #15803D; font-weight: 700; }
+    .no { color: #C2410C; font-weight: 700; }
+    #summary { max-width: 900px; margin: 0 0 16px; padding: 12px 16px; border-radius: 10px;
+               font-weight: 700; }
+    #summary.pass { background: #DCFCE7; color: #15803D; }
+    #summary.fail { background: #FEE7DC; color: #C2410C; }
+    code { background: #F2F5F7; padding: 1px 5px; border-radius: 4px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1>Kiểm thử logic phiên chơi</h1>
+  <p class="sub">
+    Chạy các ca nghiệm thu ở tầng <code>session.js</code> (chấm điểm, đồng hồ, tự nộp, khôi phục, reset).
+    Các ca giao diện — hộp thoại nộp bài, nhấn giữ reset, cuộn thẻ dài, Safari iPad — kiểm tra thủ công theo README.
+  </p>
+  <div id="summary">Đang chạy…</div>
+  <table>
+    <thead><tr><th style="width:56px">#</th><th>Ca kiểm tra</th><th style="width:96px">Kết quả</th><th>Ghi chú</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <script type="module">
+    import { QUESTIONS, DURATION_SECONDS } from '../src/content.js';
+    import * as S from '../src/session.js';
+    import { SESSION_KEY } from '../src/storage.js';
+
+    const KEY_ANSWERS = ['A', 'B', 'B', 'A', 'C', 'B', 'A', 'C'];
+    const WRONG_ANSWERS = ['B', 'A', 'A', 'B', 'A', 'A', 'B', 'A'];
+    const results = [];
+
+    const reset = () => { localStorage.removeItem(SESSION_KEY); S.clear(); };
+    const answerAll = (list) => QUESTIONS.forEach((q, i) => S.setAnswer(q.id, list[i]));
+
+    /** Giả lập trôi thời gian bằng cách kéo lùi startedAt/deadlineAt trong bản lưu. */
+    function shiftClock(ms) {
+      const raw = JSON.parse(localStorage.getItem(SESSION_KEY));
+      raw.startedAt -= ms;
+      raw.deadlineAt -= ms;
+      localStorage.setItem(SESSION_KEY, JSON.stringify(raw));
+    }
+
+    function test(name, fn) {
+      try {
+        const note = fn() || '';
+        results.push({ name, pass: true, note });
+      } catch (err) {
+        results.push({ name, pass: false, note: err.message });
+      }
+    }
+    const assert = (cond, msg) => { if (!cond) throw new Error(msg); };
+
+    /* ---------------- 1. Chấm điểm ---------------- */
+
+    test('Trả lời đúng cả 8 câu → 8/8', () => {
+      reset(); S.start(); answerAll(KEY_ANSWERS);
+      const r = S.submit('manual');
+      assert(r.score === 8, `điểm = ${r.score}, cần 8`);
+      return 'submissionReason = manual';
+    });
+
+    test('Trả lời sai cả 8 câu → 0/8', () => {
+      reset(); S.start(); answerAll(WRONG_ANSWERS);
+      const r = S.submit('manual');
+      assert(r.score === 0, `điểm = ${r.score}, cần 0`);
+      return 'không trừ điểm âm';
+    });
+
+    test('Bỏ trống toàn bộ → 0/8 và giữ dấu vết câu trống', () => {
+      reset(); S.start();
+      const r = S.submit('manual');
+      assert(r.score === 0, `điểm = ${r.score}, cần 0`);
+      assert(Object.keys(r.submittedAnswers).length === 0, 'submittedAnswers phải rỗng');
+      return 'review hiện “Chưa trả lời” cho cả 8 câu';
+    });
+
+    test('Chọn A rồi đổi sang B → chỉ giữ lựa chọn cuối', () => {
+      reset(); S.start();
+      S.setAnswer('q1', 'A'); S.setAnswer('q1', 'B');
+      const s = S.getSession();
+      assert(s.progress.answers.q1 === 'B', `đang là ${s.progress.answers.q1}`);
+      assert(S.answeredCount() === 1, 'phải đếm đúng 1 câu đã trả lời');
+      return 'một câu chỉ có một đáp án';
+    });
+
+    test('Chạm lại đáp án đang chọn không bỏ lựa chọn', () => {
+      reset(); S.start();
+      S.setAnswer('q2', 'B'); S.setAnswer('q2', 'B');
+      assert(S.getSession().progress.answers.q2 === 'B', 'lựa chọn bị bỏ');
+      return '';
+    });
+
+    test('Đổi câu và đổi bằng chứng không làm mất lựa chọn', () => {
+      reset(); S.start();
+      S.setAnswer('q1', 'A');
+      S.setCurrentQuestion('q5'); S.setActiveEvidence('ev3');
+      S.setAnswer('q5', 'C');
+      S.setCurrentQuestion('q1'); S.setActiveEvidence('ev1');
+      const a = S.getSession().progress.answers;
+      assert(a.q1 === 'A' && a.q5 === 'C', 'đáp án bị mất khi chuyển qua lại');
+      assert(S.getResult() === null, 'chưa nộp mà đã có kết quả');
+      return 'chưa nộp thì chưa có điểm/lời giải';
+    });
+
+    /* ---------------- 2. Đồng hồ và tự nộp ---------------- */
+
+    test('Đồng hồ khởi tạo đúng 300 giây', () => {
+      reset(); S.start();
+      const s = S.getSession();
+      assert(s.deadlineAt - s.startedAt === DURATION_SECONDS * 1000, 'deadline sai');
+      const left = S.remainingMs();
+      assert(left > 299_000 && left <= 300_000, `còn lại ${left}ms`);
+      return `deadlineAt = startedAt + ${DURATION_SECONDS}s`;
+    });
+
+    test('Hết 300 giây → tự nộp đúng một lần từ đáp án đã lưu', () => {
+      reset(); S.start();
+      S.setAnswer('q1', 'A'); S.setAnswer('q2', 'B');
+      shiftClock(301_000);
+      const restored = S.restore();
+      assert(restored.autoSubmitted, 'không tự nộp khi quá hạn');
+      const r = S.getResult();
+      assert(r.submissionReason === 'timeout', `lý do nộp = ${r.submissionReason}`);
+      assert(r.score === 2, `điểm = ${r.score}, cần 2`);
+      const before = r.submittedAt;
+      S.submit('manual'); // bấm nộp thêm lần nữa
+      assert(S.getResult().submittedAt === before, 'phiên bị chấm lại lần hai');
+      return 'idempotent: vừa hết giờ vừa bấm nộp vẫn chỉ 1 kết quả';
+    });
+
+    test('Hết giờ thì không nhận lựa chọn mới', () => {
+      reset(); S.start();
+      shiftClock(301_000);
+      S.restore();
+      const res = S.setAnswer('q3', 'A');
+      assert(!res.accepted, 'vẫn nhận đáp án sau khi hết giờ');
+      assert(S.getResult().submittedAnswers.q3 === undefined, 'đáp án lọt vào bài đã nộp');
+      return 'khóa bài sau khi nộp';
+    });
+
+    test('Bấm Nộp bài nhiều lần chỉ tạo một kết quả', () => {
+      reset(); S.start(); answerAll(KEY_ANSWERS);
+      const first = S.submit('manual');
+      const second = S.submit('manual');
+      const third = S.submit('timeout');
+      assert(first.submittedAt === second.submittedAt, 'lần 2 tạo kết quả mới');
+      assert(first.submittedAt === third.submittedAt, 'timeout ghi đè kết quả manual');
+      return '';
+    });
+
+    /* ---------------- 3. Khôi phục sau reload ---------------- */
+
+    test('Reload giữa lượt → khôi phục thời gian thật và đáp án', () => {
+      reset(); S.start();
+      S.setAnswer('q1', 'A'); S.setCurrentQuestion('q4'); S.setActiveEvidence('ev2');
+      shiftClock(120_000); // đã trôi 2 phút
+      const r = S.restore();
+      assert(r.restored && !r.autoSubmitted, 'không khôi phục đúng trạng thái playing');
+      const left = S.remainingMs();
+      assert(left > 178_000 && left < 181_000, `còn lại ${Math.round(left / 1000)}s, cần ~180s`);
+      const s = S.getSession();
+      assert(s.progress.answers.q1 === 'A', 'mất đáp án');
+      assert(s.progress.currentQuestionId === 'q4', 'mất câu đang xem');
+      assert(s.progress.activeEvidenceId === 'ev2', 'mất tab bằng chứng');
+      return 'đồng hồ không bị tạm dừng khi reload';
+    });
+
+    test('Reload tại màn kết quả → điểm không đổi, không bắt đầu lại', () => {
+      reset(); S.start(); answerAll(KEY_ANSWERS);
+      const before = S.submit('manual');
+      const r = S.restore();
+      assert(r.restored, 'không đọc lại được phiên đã nộp');
+      assert(S.getSession().status === S.STATUS.RESULT, 'trạng thái không phải result');
+      assert(S.getResult().score === before.score, 'điểm thay đổi sau reload');
+      assert(S.getResult().submittedAt === before.submittedAt, 'thời điểm nộp thay đổi');
+      return 'xem lời giải / tải lại đều giữ nguyên điểm';
+    });
+
+    test('Dữ liệu hỏng → báo corrupt, không im lặng làm mất bài', () => {
+      reset();
+      localStorage.setItem(SESSION_KEY, '{ khong-phai-json');
+      const r = S.restore();
+      assert(r.corrupt, 'không phát hiện dữ liệu hỏng');
+      return 'app mở hộp thoại xác nhận xóa phiên lỗi';
+    });
+
+    test('Phiên thuộc bộ đề cũ → không chấm bằng đề mới', () => {
+      reset(); S.start(); S.setAnswer('q1', 'A');
+      const raw = JSON.parse(localStorage.getItem(SESSION_KEY));
+      raw.contentVersion = '0.9.0-cu';
+      localStorage.setItem(SESSION_KEY, JSON.stringify(raw));
+      const r = S.restore();
+      assert(r.corrupt, 'vẫn nhận phiên khác contentVersion');
+      return 'contentVersion của phiên phải khớp bản build';
+    });
+
+    /* ---------------- 4. Reset của người phụ trách ---------------- */
+
+    test('Reset → xóa phiên, về lượt trống, đồng hồ chưa chạy', () => {
+      reset(); S.start(); answerAll(KEY_ANSWERS); S.submit('manual');
+      S.clear();
+      assert(!S.hasSession(), 'phiên vẫn còn sau reset');
+      assert(localStorage.getItem(SESSION_KEY) === null, 'localStorage chưa được dọn');
+      assert(S.restore().restored === false, 'vẫn khôi phục được phiên đã xóa');
+      assert(S.remainingMs() === DURATION_SECONDS * 1000, 'đồng hồ đang chạy khi chưa vào lượt');
+      return 'lượt tiếp theo bắt đầu sạch';
+    });
+
+    /* ---------------- Kết xuất ---------------- */
+
+    reset();
+    const rows = document.getElementById('rows');
+    results.forEach((r, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${i + 1}</td><td></td><td class="${r.pass ? 'ok' : 'no'}">${
+        r.pass ? 'ĐẠT' : 'KHÔNG ĐẠT'
+      }</td><td></td>`;
+      tr.children[1].textContent = r.name;
+      tr.children[3].textContent = r.note;
+      rows.appendChild(tr);
+    });
+
+    const failed = results.filter((r) => !r.pass).length;
+    const summary = document.getElementById('summary');
+    summary.className = failed ? 'fail' : 'pass';
+    summary.textContent = failed
+      ? `${failed}/${results.length} ca KHÔNG ĐẠT`
+      : `Tất cả ${results.length} ca ĐẠT`;
+    window.__acceptance = { total: results.length, failed, results };
+  </script>
+</body>
+</html>

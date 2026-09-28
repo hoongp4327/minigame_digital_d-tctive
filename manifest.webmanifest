@@ -1,0 +1,20 @@
+{
+  "name": "Digital Detective — Vụ án tài khoản biến mất",
+  "short_name": "Digital Detective",
+  "description": "Mini game điều tra an toàn số cho học sinh THCS: 4 bằng chứng, 8 câu hỏi, 5 phút.",
+  "lang": "vi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#F6F3EB",
+  "theme_color": "#10243A",
+  "icons": [
+    {
+      "src": "assets/img/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

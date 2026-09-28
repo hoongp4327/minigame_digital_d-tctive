@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 340" width="420" height="340" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="r-folder" x1="0" y1="0" x2=".3" y2="1">
+      <stop offset="0" stop-color="#F79462"/><stop offset=".6" stop-color="#F16A36"/><stop offset="1" stop-color="#DB551F"/>
+    </linearGradient>
+    <linearGradient id="r-shield" x1="0" y1="0" x2=".4" y2="1">
+      <stop offset="0" stop-color="#3E7FB6"/><stop offset="1" stop-color="#1D4A73"/>
+    </linearGradient>
+    <linearGradient id="r-steel" x1="0" y1="0" x2=".4" y2="1">
+      <stop offset="0" stop-color="#EDF3F7"/><stop offset=".5" stop-color="#C6D4DF"/><stop offset="1" stop-color="#93A6B6"/>
+    </linearGradient>
+    <radialGradient id="r-glass" cx=".34" cy=".3" r=".78">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".92"/>
+      <stop offset=".45" stop-color="#9DEAF2" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#3FC3D4" stop-opacity=".76"/>
+    </radialGradient>
+    <linearGradient id="r-rim" x1="0" y1="0" x2=".5" y2="1">
+      <stop offset="0" stop-color="#8FE6F0"/><stop offset="1" stop-color="#2FA7BA"/>
+    </linearGradient>
+    <filter id="r-soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#10243A" flood-opacity=".2"/>
+    </filter>
+  </defs>
+
+  <!-- Mang giay confetti -->
+  <path d="M26 96l30 10-24 20z" fill="#54D7E5"/>
+  <path d="M16 176l26 8-20 17z" fill="#54D7E5" opacity=".7"/>
+  <path d="M352 38l24 22-30 8z" fill="#F16A36" opacity=".85"/>
+  <path d="M396 128l18 20-24 5z" fill="#54D7E5" opacity=".6"/>
+
+  <!-- To giay ket qua -->
+  <g filter="url(#r-soft)" transform="rotate(6 250 118)">
+    <rect x="186" y="34" width="150" height="164" rx="8" fill="#FFFFFF"/>
+    <g opacity=".45">
+      <rect x="204" y="60" width="98" height="9" rx="4.5" fill="#94A5B4"/>
+      <rect x="204" y="82" width="114" height="9" rx="4.5" fill="#C6D1DA"/>
+      <rect x="204" y="104" width="86" height="9" rx="4.5" fill="#C6D1DA"/>
+      <rect x="204" y="126" width="110" height="9" rx="4.5" fill="#C6D1DA"/>
+      <rect x="204" y="148" width="72" height="9" rx="4.5" fill="#C6D1DA"/>
+    </g>
+  </g>
+
+  <!-- Bia ho so -->
+  <g filter="url(#r-soft)">
+    <path d="M78 116h76l14 20h122a14 14 0 0 1 14 14v128a14 14 0 0 1-14 14H78a14 14 0 0 1-14-14V130a14 14 0 0 1 14-14z" fill="url(#r-folder)"/>
+    <path d="M64 168h240v6H64z" fill="#FFFFFF" opacity=".16"/>
+  </g>
+
+  <!-- Khien -->
+  <g filter="url(#r-soft)" transform="translate(148 148)">
+    <path d="M60 0l58 22v52c0 40-25 68-58 82-33-14-58-42-58-82V22z" fill="url(#r-shield)"/>
+    <path d="M60 0l58 22v52c0 40-25 68-58 82z" fill="#FFFFFF" opacity=".08"/>
+    <path d="M36 76l17 18 33-38" fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Kinh lup -->
+  <g filter="url(#r-soft)" transform="rotate(-16 306 216)">
+    <rect x="336" y="248" width="26" height="70" rx="13" fill="url(#r-steel)" stroke="#8CA2B4" stroke-width="2"/>
+    <circle cx="306" cy="216" r="58" fill="url(#r-glass)"/>
+    <circle cx="306" cy="216" r="58" fill="none" stroke="url(#r-rim)" stroke-width="10"/>
+    <circle cx="306" cy="216" r="63" fill="none" stroke="#1E4256" stroke-width="2.4" opacity=".4"/>
+    <path d="M276 188a42 42 0 0 1 26-15" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity=".7"/>
+  </g>
+</svg>

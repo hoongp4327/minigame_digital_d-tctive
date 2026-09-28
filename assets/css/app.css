@@ -1,0 +1,845 @@
+@import url('../fonts.css');
+
+/* ================================================================
+   1. Token
+   ================================================================ */
+:root {
+  --navy: #10243A;
+  --navy-soft: #1B3854;
+  --paper: #F6F3EB;
+  --surface: #FFFFFF;
+  --orange: #F16A36;
+  --orange-dark: #D9531F;
+  --orange-tint: #FDEDE5;
+  --cyan: #54D7E5;
+  --cyan-tint: #E3F8FB;
+  --cyan-deep: #2FA7BA;
+  --muted: #5F6B76;
+  --border: #D8DEE4;
+  --border-strong: #C2CCD6;
+  --danger: #C2410C;
+
+  --r-lg: 16px;
+  --r-md: 12px;
+  --r-btn: 11px;
+  --r-sm: 8px;
+
+  --s1: 8px;
+  --s2: 12px;
+  --s3: 16px;
+  --s4: 24px;
+  --s5: 32px;
+  --s6: 48px;
+
+  --shadow-sm: 0 2px 6px rgba(16, 36, 58, .06);
+  --shadow-md: 0 6px 18px rgba(16, 36, 58, .09);
+  --shadow-lg: 0 14px 38px rgba(16, 36, 58, .14);
+
+  --dur: 200ms;
+  --ease: cubic-bezier(.22, .61, .36, 1);
+
+  --header-h: 64px;
+  --app-max: 1440px;
+
+  /* Thang chữ mặc định cho iPad ngang 1024×768 */
+  --fs-body: 16px;
+  --fs-lead: 17px;
+  --fs-question: 22px;
+  --fs-screen-title: 28px;
+  --fs-hero: 46px;
+}
+
+/* Desktop rộng: tăng khoảng thở và cỡ hình, chữ chỉ nhích nhẹ (không phóng vô hạn) */
+@media (min-width: 1180px) {
+  :root {
+    --fs-body: 17px;
+    --fs-lead: 18px;
+    --fs-question: 24px;
+    --fs-screen-title: 32px;
+    --fs-hero: 48px;
+    --header-h: 68px;
+  }
+}
+@media (min-width: 1400px) {
+  :root {
+    --fs-question: 26px;
+    --fs-screen-title: 34px;
+    --fs-hero: 52px;
+  }
+}
+
+/* ================================================================
+   2. Nền tảng
+   ================================================================ */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: var(--navy);
+  background: var(--paper);
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;              /* không để trang cuộn; chỉ vùng nội dung cuộn */
+  overscroll-behavior: none;
+}
+
+h1, h2, h3, p, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+button { font: inherit; color: inherit; }
+
+.icon { flex: none; display: block; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 3px solid var(--cyan-deep);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ================================================================
+   3. Khung ứng dụng
+   ================================================================ */
+#app {
+  height: 100dvh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+@supports (height: 100dvh) { #app { height: 100dvh; } }
+
+.shell {
+  width: 100%;
+  max-width: var(--app-max);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 var(--s3);
+}
+@media (min-width: 1180px) { .shell { padding: 0 var(--s4); } }
+
+/* ---------- Header ---------- */
+.app-header {
+  flex: none;
+  height: var(--header-h);
+  margin-top: var(--s2);
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: 0 var(--s4);
+  background: var(--navy);
+  color: #fff;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand img { width: 34px; height: 34px; }
+.brand-name {
+  font-size: 19px; font-weight: 800; letter-spacing: .6px;
+  white-space: nowrap;
+}
+.brand-name em { font-style: normal; color: var(--cyan); }
+
+.header-spacer { flex: 1 1 auto; }
+
+.file-tag {
+  font-size: 13px; font-weight: 700; letter-spacing: .8px;
+  padding: 6px 14px; border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, .35);
+  color: #fff; white-space: nowrap;
+}
+.file-tag.is-submitted { background: var(--cyan); border-color: var(--cyan); color: var(--navy); }
+
+/* Đồng hồ + tiến độ trên header màn chơi */
+.hud { display: flex; align-items: center; gap: var(--s4); }
+.timer {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 16px; border-radius: 999px;
+  background: rgba(255, 255, 255, .1);
+  border: 1.5px solid rgba(255, 255, 255, .22);
+  font-variant-numeric: tabular-nums;
+  font-size: 19px; font-weight: 800; letter-spacing: .5px;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.timer.is-warning { background: rgba(241, 106, 54, .22); border-color: var(--orange); color: #FFD9C8; }
+.progress-read { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #CBD8E4; }
+.progress-read b { color: #fff; font-weight: 700; }
+.progress-bar {
+  width: 104px; height: 8px; border-radius: 999px;
+  background: rgba(255, 255, 255, .18); overflow: hidden;
+}
+.progress-bar span {
+  display: block; height: 100%; border-radius: 999px;
+  background: var(--cyan);
+  transition: width var(--dur) var(--ease);
+}
+
+/* ---------- Thân màn ---------- */
+.app-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  margin-bottom: var(--s2);
+  overflow: hidden;
+  position: relative;
+}
+
+.screen {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  animation: screen-in var(--dur) var(--ease) both;
+}
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Texture giấy chỉ ở vùng trang trí, 3–5% */
+.paper-tint {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(rgba(16, 36, 58, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 36, 58, .035) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+/* ================================================================
+   4. Nút
+   ================================================================ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 10px;
+  min-height: 48px; padding: 12px 24px;
+  border: 1.5px solid transparent; border-radius: var(--r-btn);
+  font-size: var(--fs-body); font-weight: 700;
+  background: var(--surface); color: var(--navy);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+              transform 120ms var(--ease), box-shadow var(--dur) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+  background: var(--orange); color: #fff;
+  box-shadow: 0 6px 16px rgba(241, 106, 54, .3);
+  font-weight: 800;
+}
+.btn-primary:hover { background: var(--orange-dark); }
+
+.btn-secondary { border-color: var(--border-strong); background: var(--surface); }
+.btn-secondary:hover { border-color: var(--navy-soft); background: #FAFBFC; }
+
+.btn-ghost { background: transparent; color: var(--muted); font-weight: 600; }
+.btn-ghost:hover { color: var(--navy); background: #F2F5F7; }
+
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn:disabled:active { transform: none; }
+
+.btn-lg { min-height: 60px; font-size: 19px; padding: 14px 34px; }
+@media (min-width: 1180px) { .btn-lg { min-height: 64px; font-size: 20px; } }
+
+/* ================================================================
+   5. Màn 1 — Chào mừng
+   ================================================================ */
+.welcome {
+  flex-direction: row;
+  align-items: stretch;
+}
+.welcome-copy {
+  flex: 0 0 55%;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: var(--s5) var(--s5) var(--s5) var(--s6);
+  min-width: 0;
+}
+@media (max-width: 1100px) { .welcome-copy { padding: var(--s4) var(--s4) var(--s4) var(--s5); } }
+
+.hero-title {
+  font-size: var(--fs-hero);
+  font-weight: 800;
+  line-height: 1.06;
+  letter-spacing: -.5px;
+  margin-bottom: var(--s3);
+}
+.hero-title span { display: block; }
+.hero-title .accent { color: var(--orange); }
+
+.hero-tagline {
+  font-size: var(--fs-lead);
+  color: var(--muted);
+  max-width: 30em;
+  margin-bottom: var(--s4);
+}
+
+.chip-row { display: flex; flex-wrap: wrap; gap: var(--s2); margin-bottom: var(--s5); }
+.chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-btn);
+  background: var(--surface);
+  font-size: 15px; font-weight: 600;
+  white-space: nowrap;
+}
+.chip .icon { color: var(--cyan-deep); }
+
+.hero-note { margin-top: var(--s4); font-size: 14px; color: var(--muted); }
+
+.welcome-art {
+  flex: 1 1 45%;
+  min-width: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--s2);
+  border-left: 1px solid var(--border);
+}
+.welcome-art img { width: 100%; max-width: 620px; height: auto; max-height: 100%; object-fit: contain; }
+
+/* ================================================================
+   6. Màn 2 — Nhận vụ án
+   ================================================================ */
+.briefing { flex-direction: row; }
+.briefing-left {
+  flex: 1 1 56%;
+  min-width: 0;
+  display: flex; flex-direction: column;
+  padding: var(--s5) var(--s4) var(--s4) var(--s5);
+  overflow: hidden;
+}
+.briefing-right {
+  flex: 0 0 44%;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: var(--s4);
+  padding: var(--s5) var(--s5) var(--s4) var(--s4);
+  border-left: 1px solid var(--border);
+  min-width: 0;
+}
+@media (max-width: 1100px) {
+  .briefing-left { padding: var(--s4); }
+  .briefing-right { padding: var(--s4); }
+}
+
+.screen-title { font-size: var(--fs-screen-title); font-weight: 800; line-height: 1.2; }
+
+.note-wrap { position: relative; margin-top: var(--s4); max-width: 560px; }
+.note-paper {
+  position: relative;
+  background: #FFFDF6;
+  border: 1px solid #E8E0CE;
+  border-radius: 3px;
+  padding: var(--s4) var(--s4) var(--s4) 60px;
+  font-size: var(--fs-lead);
+  line-height: 1.7;
+  box-shadow: var(--shadow-md);
+  /* mép giấy hơi lệch cho giống tờ ghi chú */
+  clip-path: polygon(0 1.2%, 100% 0, 99.4% 99%, .6% 100%);
+}
+.note-paper::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(transparent 0 31px, rgba(16, 36, 58, .05) 31px 32px);
+  pointer-events: none;
+}
+.paper-clip {
+  position: absolute; top: -18px; left: 20px;
+  width: 24px; height: 54px;
+  border: 4px solid #A8B6C2;
+  border-radius: 13px;
+  border-bottom-color: transparent;
+  transform: rotate(-8deg);
+  z-index: 2;
+}
+.paper-clip::before {
+  content: ''; position: absolute; top: 9px; left: 3px;
+  width: 12px; height: 34px;
+  border: 4px solid #C3CDD7; border-radius: 8px; border-bottom-color: transparent;
+}
+
+.briefing-props { margin-top: auto; padding-top: var(--s4); max-width: 420px; }
+.briefing-props img { width: 100%; height: auto; display: block; }
+
+.mission-list { display: flex; flex-direction: column; gap: var(--s3); margin-top: var(--s3); }
+.mission {
+  display: flex; align-items: center; gap: var(--s3);
+  font-size: var(--fs-lead); font-weight: 600;
+}
+.mission-badge {
+  flex: none; width: 52px; height: 52px; border-radius: 14px;
+  display: grid; place-items: center;
+  background: var(--cyan-tint); color: var(--navy);
+  border: 1.5px solid #BFECF3;
+}
+.mission-index { font-weight: 800; }
+
+.timer-note {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 15px; color: var(--muted);
+}
+.footnote { font-size: 14px; color: var(--muted); }
+.briefing-right .footnote { text-align: right; }
+
+.back-row { margin-top: var(--s4); }
+
+/* ================================================================
+   7. Màn 3 — Điều tra
+   ================================================================ */
+.game {
+  flex-direction: row;
+  gap: var(--s4);
+  padding: var(--s4);
+  min-height: 0;
+}
+.evidence-pane { flex: 0 0 48%; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.question-pane { flex: 1 1 52%; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+
+/* ---- Bằng chứng ---- */
+.pane-title { font-size: var(--fs-screen-title); font-weight: 800; margin-bottom: var(--s2); }
+
+.evidence-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s2);
+  margin-bottom: var(--s2);
+}
+.evidence-tab {
+  min-height: 48px;
+  padding: 10px 16px;
+  text-align: left;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-btn);
+  background: var(--surface);
+  font-size: 15px; font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.evidence-tab:hover { border-color: var(--border-strong); }
+.evidence-tab[aria-selected='true'] {
+  background: var(--orange); border-color: var(--orange); color: #fff; font-weight: 700;
+  box-shadow: 0 4px 12px rgba(241, 106, 54, .26);
+}
+
+.evidence-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: #FAFBFC;
+  padding: var(--s3) var(--s3) var(--s4);
+}
+.evidence-card-title {
+  font-size: 18px; font-weight: 800;
+  padding-bottom: var(--s2);
+  margin-bottom: var(--s3);
+  border-bottom: 1px solid var(--border);
+}
+.ev-lead { color: var(--muted); margin-bottom: var(--s3); }
+
+.ev-profile {
+  display: flex; align-items: center; gap: var(--s2);
+  padding: var(--s2) var(--s3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  margin-bottom: var(--s2);
+}
+.ev-avatar {
+  flex: none; width: 48px; height: 48px; border-radius: 50%;
+  background: #E3E9EE; color: #8A9AA8;
+  display: grid; place-items: center;
+}
+.ev-profile-name { font-weight: 700; line-height: 1.3; }
+.ev-profile-handle {
+  font-size: 15px; color: var(--muted);
+  font-variant-ligatures: none;
+  word-break: break-all;
+}
+.ev-profile-meta { font-size: 14px; color: var(--muted); }
+
+.ev-message {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  border-top-left-radius: 4px;
+  padding: var(--s3);
+  line-height: 1.6;
+}
+.ev-typing { display: flex; gap: 5px; margin-top: var(--s2); }
+.ev-typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--border-strong); }
+
+.ev-list { display: flex; flex-direction: column; gap: var(--s2); }
+.ev-list li {
+  display: flex; gap: 10px;
+  padding: var(--s2) var(--s3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  line-height: 1.55;
+}
+.ev-list li::before {
+  content: ''; flex: none;
+  width: 7px; height: 7px; margin-top: .62em;
+  border-radius: 50%; background: var(--cyan-deep);
+}
+
+.ev-log { display: flex; flex-direction: column; }
+.ev-log li {
+  display: flex; gap: var(--s3);
+  padding: var(--s2) 0 var(--s2) var(--s3);
+  border-left: 2px solid var(--border);
+  position: relative;
+  line-height: 1.55;
+}
+.ev-log li::before {
+  content: ''; position: absolute; left: -6px; top: 1.05em;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--surface); border: 2.5px solid var(--cyan-deep);
+}
+.ev-log time {
+  flex: none; font-weight: 700; font-variant-numeric: tabular-nums;
+  color: var(--navy);
+}
+
+/* ---- Câu hỏi ---- */
+.q-label {
+  font-size: 15px; font-weight: 800; letter-spacing: 1px;
+  color: var(--orange); text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.q-prompt {
+  font-size: var(--fs-question);
+  font-weight: 700; line-height: 1.32;
+  margin-bottom: var(--s3);
+}
+
+.options { display: flex; flex-direction: column; gap: var(--s2); }
+.option {
+  display: flex; align-items: center; gap: var(--s3);
+  width: 100%;
+  min-height: 56px;
+  padding: 12px var(--s3);
+  text-align: left;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: var(--fs-body);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.option:hover { border-color: var(--border-strong); }
+.option[aria-checked='true'] {
+  background: var(--orange-tint);
+  border-color: var(--orange);
+}
+.option-radio {
+  flex: none; width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  display: grid; place-items: center;
+  transition: border-color var(--dur) var(--ease);
+}
+.option[aria-checked='true'] .option-radio { border-color: var(--orange); }
+.option-radio::after {
+  content: ''; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--orange);
+  transform: scale(0);
+  transition: transform 140ms var(--ease);
+}
+.option[aria-checked='true'] .option-radio::after { transform: scale(1); }
+.option-key { flex: none; font-weight: 800; width: 1.2em; }
+.option-text { min-width: 0; }
+.option:disabled { cursor: default; opacity: 1; }
+
+.save-hint {
+  display: flex; align-items: center; gap: 8px;
+  min-height: 26px; margin-top: var(--s2);
+  font-size: 14px; color: var(--muted);
+}
+.save-hint.is-error { color: var(--danger); font-weight: 600; }
+
+/* ---- Dãy 1–8 ---- */
+.q-nav {
+  display: flex; flex-wrap: wrap; gap: var(--s1);
+  margin-top: var(--s3);
+}
+.q-nav-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-weight: 700; font-size: 16px;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.q-nav-btn.is-answered { background: var(--cyan-tint); border-color: #BFECF3; }
+.q-nav-btn.is-current { border-color: var(--orange); border-width: 2.5px; color: var(--orange); }
+
+/* ---- Thanh thao tác ---- */
+.action-bar {
+  display: flex; align-items: center; gap: var(--s2);
+  margin-top: auto;
+  padding-top: var(--s3);
+}
+.action-bar .spacer { flex: 1 1 auto; }
+.action-bar .btn { min-height: 52px; padding: 12px 18px; }
+
+.time-warning {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: var(--s2);
+  padding: 10px var(--s3);
+  border-radius: var(--r-btn);
+  background: var(--orange-tint);
+  border: 1.5px solid #F8C9B2;
+  color: var(--danger);
+  font-size: 15px; font-weight: 600;
+}
+
+/* ================================================================
+   8. Màn 4 — Kết quả
+   ================================================================ */
+.result { flex-direction: row; }
+.result-main {
+  flex: 1 1 58%;
+  min-width: 0;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: var(--s5) var(--s4) var(--s4) var(--s5);
+  overflow-y: auto;
+}
+.result-art {
+  flex: 0 0 42%;
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--s4);
+  border-left: 1px solid var(--border);
+  min-width: 0;
+}
+.result-art img { width: 100%; max-width: 420px; height: auto; max-height: 100%; object-fit: contain; }
+@media (max-width: 1100px) {
+  .result-main { padding: var(--s4); }
+}
+
+.result-main > * { max-width: 660px; }
+.result-heading { font-size: var(--fs-screen-title); font-weight: 800; margin-bottom: var(--s4); }
+
+.score-card {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: var(--s4) var(--s5);
+  background: var(--cyan-tint);
+  border: 1.5px solid #BFECF3;
+  border-radius: var(--r-lg);
+  margin-bottom: var(--s3);
+}
+.score-value {
+  font-size: 76px; font-weight: 800; line-height: .95;
+  letter-spacing: -2px;
+  font-variant-numeric: tabular-nums;
+  color: var(--navy);
+}
+@media (min-width: 1180px) { .score-value { font-size: 88px; } }
+.score-label {
+  font-size: 17px; font-weight: 800; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--navy);
+}
+
+.staff-banner {
+  display: flex; align-items: center; gap: var(--s2);
+  padding: 14px var(--s4);
+  background: var(--cyan);
+  border-radius: var(--r-md);
+  color: var(--navy);
+  font-size: var(--fs-lead); font-weight: 700;
+  margin-bottom: var(--s3);
+}
+
+.timeout-note {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: var(--s3);
+  font-size: 15px; font-weight: 600; color: var(--danger);
+}
+
+.staff-zone {
+  margin-top: var(--s4);
+  padding-top: var(--s4);
+  border-top: 1px solid var(--border);
+}
+.staff-zone-label {
+  font-size: 13px; font-weight: 800; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: var(--s2);
+}
+
+/* Nút nhấn giữ 1,5 giây */
+.hold-btn { position: relative; overflow: hidden; width: 100%; }
+.hold-btn .hold-fill {
+  position: absolute; inset: 0 auto 0 0;
+  width: 0;
+  background: var(--cyan-tint);
+  pointer-events: none;
+}
+.hold-btn.is-holding .hold-fill { transition: width 1500ms linear; width: 100%; }
+.hold-btn > span { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 10px; }
+
+/* ---- Lời giải ---- */
+.review-panel {
+  position: absolute; inset: 0;
+  background: var(--surface);
+  display: flex; flex-direction: column;
+  z-index: 20;
+  animation: screen-in var(--dur) var(--ease) both;
+}
+.review-head {
+  flex: none;
+  display: flex; align-items: center; gap: var(--s3);
+  padding: var(--s3) var(--s4);
+  border-bottom: 1px solid var(--border);
+}
+.review-head h2 { font-size: 22px; font-weight: 800; }
+.review-body {
+  flex: 1 1 auto; min-height: 0;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: var(--s4);
+  display: flex; flex-direction: column; gap: var(--s3);
+}
+.review-item {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--s3);
+  background: #FAFBFC;
+}
+.review-item-head {
+  display: flex; align-items: baseline; gap: var(--s2);
+  margin-bottom: var(--s2);
+}
+.review-num { font-size: 14px; font-weight: 800; letter-spacing: .8px; color: var(--muted); }
+.review-q { font-size: 18px; font-weight: 700; line-height: 1.35; }
+.review-rows { display: flex; flex-direction: column; gap: 6px; }
+.review-row { display: flex; gap: 10px; align-items: baseline; font-size: 15px; }
+.review-row dt { flex: none; width: 10.5em; color: var(--muted); }
+.review-row dd { margin: 0; font-weight: 600; }
+.review-row.is-correct dd { color: #15803D; }
+.review-row.is-wrong dd { color: var(--danger); }
+.review-row.is-blank dd { color: var(--muted); font-style: italic; font-weight: 500; }
+.review-explain {
+  margin-top: var(--s2); padding-top: var(--s2);
+  border-top: 1px dashed var(--border);
+  font-size: 15px; color: var(--muted); line-height: 1.6;
+}
+.review-badge {
+  margin-left: auto; flex: none;
+  font-size: 13px; font-weight: 800; letter-spacing: .5px;
+  padding: 4px 12px; border-radius: 999px;
+}
+.review-badge.ok { background: #DCFCE7; color: #15803D; }
+.review-badge.no { background: #FEE7DC; color: var(--danger); }
+.review-badge.blank { background: #EEF1F4; color: var(--muted); }
+
+/* ================================================================
+   9. Hộp thoại
+   ================================================================ */
+.overlay {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(16, 36, 58, .55);
+  display: grid; place-items: center;
+  padding: var(--s4);
+  animation: fade-in 160ms var(--ease) both;
+}
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.dialog {
+  width: min(520px, 100%);
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--s4);
+  animation: screen-in var(--dur) var(--ease) both;
+}
+.dialog h2 { font-size: 22px; font-weight: 800; margin-bottom: var(--s2); }
+.dialog p { color: var(--muted); line-height: 1.6; }
+.dialog-actions {
+  display: flex; gap: var(--s2); justify-content: flex-end;
+  margin-top: var(--s4);
+}
+
+/* ================================================================
+   10. Thông báo xoay máy / màn hình nhỏ
+   ================================================================ */
+.rotate-gate {
+  position: fixed; inset: 0; z-index: 90;
+  display: none;
+  place-items: center;
+  padding: var(--s5);
+  text-align: center;
+  background: var(--paper);
+}
+.rotate-gate .icon { color: var(--cyan-deep); margin: 0 auto var(--s3); }
+.rotate-gate h2 { font-size: 24px; font-weight: 800; margin-bottom: var(--s2); }
+.rotate-gate p { color: var(--muted); max-width: 30em; }
+
+/* Dưới 960 CSS px hoặc iPad dựng đứng: chặn chơi, dữ liệu và đồng hồ vẫn giữ */
+@media (max-width: 959px), (orientation: portrait) and (max-width: 1200px) {
+  .rotate-gate { display: grid; }
+}
+
+/* ================================================================
+   11. Cảnh báo bộ nhớ
+   ================================================================ */
+.storage-alert {
+  flex: none;
+  display: flex; align-items: center; gap: var(--s2);
+  padding: 10px var(--s4);
+  background: #FEF3C7;
+  border-bottom: 1px solid #FCD34D;
+  color: #92400E;
+  font-size: 15px; font-weight: 600;
+}
+
+/* ================================================================
+   12. Ăn mừng 8/8 — nhẹ, không kéo dài
+   ================================================================ */
+.confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 5; }
+.confetti i {
+  position: absolute; top: -14px;
+  width: 7px; height: 11px; border-radius: 2px;
+  opacity: 0;
+  animation: confetti-fall 1400ms var(--ease) forwards;
+}
+@keyframes confetti-fall {
+  0%   { opacity: 0; transform: translateY(-10px) rotate(0deg); }
+  12%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(80vh) rotate(420deg); }
+}
+
+/* ================================================================
+   13. prefers-reduced-motion
+   ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+  .hold-btn.is-holding .hold-fill { transition: width 1500ms linear !important; }
+  .confetti { display: none; }
+}

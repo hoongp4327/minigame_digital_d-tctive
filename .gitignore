@@ -1,0 +1,12 @@
+# Rác hệ điều hành
+Thumbs.db
+ehthumbs.db
+desktop.ini
+.DS_Store
+
+# Dự án không dùng npm; thư mục này chỉ xuất hiện nếu ai đó cài thêm công cụ
+node_modules/
+
+# Log và file tạm
+*.log
+*.tmp

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Digital Detective — Vụ án tài khoản biến mất</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Mini game điều tra an toàn số dành cho học sinh THCS: đọc 4 bằng chứng, trả lời 8 câu hỏi trong 5 phút.">
+  <meta name="theme-color" content="#10243A">
+  <meta name="color-scheme" content="light">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/img/logo.svg">
+  <!-- Tải sẵn toàn bộ font và hình của cả 4 màn ngay lần vào đầu tiên, để mất mạng
+       giữa lượt không làm thiếu chữ hay thiếu hình ở các màn sau. -->
+  <link rel="preload" href="assets/fonts/QdVPSTAyLFyeg_IDWvOJmVES_Hw4BXoKZA.woff2" as="font" type="font/woff2" crossorigin><!-- 400 vi -->
+  <link rel="preload" href="assets/fonts/QdVPSTAyLFyeg_IDWvOJmVES_Hw3BXo.woff2" as="font" type="font/woff2" crossorigin><!-- 400 latin -->
+  <link rel="preload" href="assets/fonts/QdVMSTAyLFyeg_IDWvOJmVES_HToIW86Rb0bcw.woff2" as="font" type="font/woff2" crossorigin><!-- 600 vi -->
+  <link rel="preload" href="assets/fonts/QdVMSTAyLFyeg_IDWvOJmVES_HToIW81Rb0.woff2" as="font" type="font/woff2" crossorigin><!-- 600 latin -->
+  <link rel="preload" href="assets/fonts/QdVMSTAyLFyeg_IDWvOJmVES_HSMIG86Rb0bcw.woff2" as="font" type="font/woff2" crossorigin><!-- 700 vi -->
+  <link rel="preload" href="assets/fonts/QdVMSTAyLFyeg_IDWvOJmVES_HSMIG81Rb0.woff2" as="font" type="font/woff2" crossorigin><!-- 700 latin -->
+  <link rel="preload" href="assets/fonts/QdVMSTAyLFyeg_IDWvOJmVES_HSQI286Rb0bcw.woff2" as="font" type="font/woff2" crossorigin><!-- 800 vi -->
+  <link rel="preload" href="assets/fonts/QdVMSTAyLFyeg_IDWvOJmVES_HSQI281Rb0.woff2" as="font" type="font/woff2" crossorigin><!-- 800 latin -->
+  <link rel="preload" href="assets/img/hero.svg" as="image" type="image/svg+xml">
+  <link rel="preload" href="assets/img/briefing-props.svg" as="image" type="image/svg+xml">
+  <link rel="preload" href="assets/img/result-props.svg" as="image" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- iPad dựng đứng hoặc viewport dưới 960 CSS px: chặn chơi, dữ liệu và đồng hồ vẫn giữ nguyên -->
+  <div class="rotate-gate" role="alert">
+    <div>
+      <svg class="icon" viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor"
+           stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2.5" y="7" width="19" height="11" rx="2"></rect>
+        <path d="M8 3.6a8 8 0 0 1 8 0"></path>
+        <path d="M13.6 2.2 16.2 3.6 14.8 6.2"></path>
+      </svg>
+      <h2>Xoay iPad ngang để chơi</h2>
+      <p>Trên máy tính, hãy mở cửa sổ trình duyệt rộng hơn 960&nbsp;px. Bài làm và đồng hồ của bạn vẫn đang được giữ nguyên.</p>
+    </div>
+  </div>
+
+  <noscript>
+    <div style="max-width:40em;margin:15vh auto;padding:0 24px;font-family:sans-serif;color:#10243A">
+      <h1>Cần bật JavaScript</h1>
+      <p>Trò chơi Digital Detective chạy hoàn toàn trên trình duyệt. Hãy bật JavaScript rồi tải lại trang.</p>
+    </div>
+  </noscript>
+
+  <script type="module" src="src/app.js"></script>
+  <script>
+    // Service worker chỉ để chạy lại được khi mất mạng sau lần tải đầu thành công.
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch((err) => {
+          console.warn('[sw] không đăng ký được:', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
