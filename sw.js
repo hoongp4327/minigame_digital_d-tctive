@@ -9,7 +9,7 @@
  * Khi phát hành bản mới: tăng CACHE_VERSION.
  */
 
-const CACHE_VERSION = 'dd-v1.0.0';
+const CACHE_VERSION = 'dd-v1.2.0';
 
 const PRECACHE = [
   './',
@@ -18,9 +18,13 @@ const PRECACHE = [
   'assets/css/app.css',
   'assets/fonts.css',
   'assets/img/logo.svg',
-  'assets/img/hero.svg',
-  'assets/img/briefing-props.svg',
+  'assets/img/background-main.jpg',
+  'assets/img/background-2.jpg',
   'assets/img/result-props.svg',
+  'assets/img/evidence-1.webp',
+  'assets/img/evidence-2.webp',
+  'assets/img/evidence-3.webp',
+  'assets/img/evidence-4.webp',
   'src/app.js',
   'src/content.js',
   'src/icons.js',

@@ -14,6 +14,7 @@ import { renderBriefing } from './screens/briefing.js';
 import { renderGame, renderTimeWarning } from './screens/game.js';
 import { renderResult, renderReview } from './screens/result.js';
 import { openDialog, closeDialog, isDialogOpen } from './screens/dialog.js';
+import { countUpScore, prefersReducedMotion } from './effects.js';
 
 const WARN_MS = 60_000;
 
@@ -62,7 +63,7 @@ function headerHTML() {
       ${brand}
       <span class="header-spacer"></span>
       <span class="file-tag${submitted ? ' is-submitted' : ''}">
-        ${submitted ? 'ĐÃ NỘP BÀI' : CASE.fileLabel}
+        ${icon.folder(17)}${submitted ? 'ĐÃ NỘP BÀI' : CASE.fileLabel}
       </span>
     </header>`;
 }
@@ -92,7 +93,48 @@ function storageBannerHTML() {
     </p>`;
 }
 
+/** Hàm dọn dẹp của các hiệu ứng đang chạy trên màn hiện tại. */
+let effectCleanups = [];
+
+function teardownEffects() {
+  effectCleanups.forEach((fn) => fn());
+  effectCleanups = [];
+}
+
+/**
+ * Gắn hiệu ứng trang trí cho màn vừa vẽ.
+ * Mọi thứ ở đây đều không bắt buộc: nếu tắt hết, app vẫn chạy đủ chức năng.
+ */
+function mountEffects() {
+  if (view === 'result') {
+    const score = root.querySelector('#score-value');
+    const r = S.getResult();
+    if (score && r) effectCleanups.push(countUpScore(score, r.score, r.total));
+  }
+}
+
+/**
+ * Đồng bộ view với state thật trước khi vẽ.
+ *
+ * Nếu phiên biến mất trong lúc view vẫn là playing/result (tab khác xoá
+ * localStorage, bộ nhớ bị dọn, hoặc một lỗi nào đó), thì vẽ màn chơi với
+ * session rỗng sẽ ném lỗi và để lại màn trắng giữa lượt tại gian hàng.
+ * Trường hợp đó lùi về màn chào mừng — trạng thái luôn hợp lệ.
+ */
+function reconcileView() {
+  const lost =
+    (view === 'playing' && !S.hasSession()) ||
+    ((view === 'result' || view === 'review') && !S.getResult());
+  if (lost) {
+    view = 'welcome';
+    stopTicking();
+  }
+}
+
 function render() {
+  reconcileView();
+  teardownEffects();
+
   root.innerHTML = `
     <div class="shell">
       ${headerHTML()}
@@ -112,6 +154,8 @@ function render() {
   if (view === 'result') {
     maybeCelebrate();
   }
+
+  mountEffects();
 }
 
 /* ================================================================
@@ -212,6 +256,13 @@ function applyAnswerToDOM(questionId, option, saved) {
     const on = btn.dataset.option === option;
     btn.setAttribute('aria-checked', String(on));
     btn.tabIndex = on ? 0 : -1;
+    // Quét sáng một nhịp trên đáp án vừa chọn — thuần trang trí, không
+    // hàm ý đúng/sai (chưa nộp thì chưa biểu thị đúng/sai).
+    if (on && !prefersReducedMotion()) {
+      btn.classList.remove('is-scanning');
+      void btn.offsetWidth;
+      btn.classList.add('is-scanning');
+    }
   });
 
   const navBtn = document.querySelector(`.q-nav-btn[data-goto="${questionId}"]`);

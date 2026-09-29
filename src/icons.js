@@ -24,5 +24,24 @@ export const icon = {
     wrap('<path d="M20 5.5v5h-5"/><path d="M19.4 10.5a7.8 7.8 0 1 0-.7 5.6"/>', s),
   save: (s) =>
     wrap('<path d="M5 4h11l3 3v13H5z"/><path d="M8.5 4v5h7V4"/><rect x="8" y="13" width="8" height="7"/>', s),
-  alert: (s) => wrap('<path d="M12 4.2 21 19.5H3z"/><path d="M12 10v4"/><path d="M12 17h.01"/>', s)
+  alert: (s) => wrap('<path d="M12 4.2 21 19.5H3z"/><path d="M12 10v4"/><path d="M12 17h.01"/>', s),
+  lock: (s) =>
+    wrap(
+      '<rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/>' +
+        '<path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/>',
+      s
+    ),
+  folder: (s) =>
+    wrap(
+      '<path d="M3.5 7.6a2 2 0 0 1 2-2h3.1l2 2.4h7.9a2 2 0 0 1 2 2v8.4a2 2 0 0 1-2 2H5.5a2 2 0 0 1-2-2z"/>',
+      s
+    ),
+  clipboard: (s) =>
+    wrap(
+      '<path d="M9 4.5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-12a2 2 0 0 0-2-2h-2"/>' +
+        '<rect x="9" y="2.8" width="6" height="3.4" rx="1.2"/>' +
+        '<path d="M8.6 11h6.8"/><path d="M8.6 15h4.6"/>',
+      s
+    ),
+  chevron: (s) => wrap('<path d="M9.5 5.5 16 12l-6.5 6.5"/>', s)
 };

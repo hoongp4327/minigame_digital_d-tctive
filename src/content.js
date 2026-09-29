@@ -18,14 +18,21 @@ export const CASE = {
   fileLabel: 'HỒ SƠ 01',
   title: ['VỤ ÁN', 'TÀI KHOẢN', 'BIẾN MẤT'],
   tagline: 'Một tin nhắn lạ. Một tài khoản bị chiếm. Bạn có tìm ra nguyên nhân?',
-  chips: ['4 bằng chứng', '8 câu hỏi', '5 phút làm bài'],
+  // Mỗi chip hiện số lớn ở trên, nhãn nhỏ ở dưới. `tone` chọn màu ô icon.
+  chips: [
+    { value: '4', label: 'bằng chứng', tone: 'orange' },
+    { value: '8', label: 'câu hỏi', tone: 'blue' },
+    { value: '5 phút', label: 'làm bài', tone: 'green' }
+  ],
   cta: 'Bắt đầu điều tra',
   note: 'Không cần đăng nhập · Chơi độc lập',
   briefingHeading: 'Chuyện gì đã xảy ra?',
+  // <em> = cụm được gạch chân màu cam trên tờ ghi chú, dùng để trỏ vào
+  // hai mấu chốt của vụ án. Đây là thẻ duy nhất được phép dùng trong story.
   story:
-    'Minh quản lý tài khoản CLB Truyền thông. Một tài khoản lạ gửi link bình chọn, ' +
+    'Minh quản lý tài khoản CLB Truyền thông. Một tài khoản lạ <em>gửi link bình chọn</em>, ' +
     'tự xưng là ban tổ chức cuộc thi của trường. Minh nhập thông tin theo hướng dẫn. ' +
-    'Đến 20:15, Minh mất quyền truy cập.',
+    'Đến 20:15, Minh <em>mất quyền truy cập</em>.',
   missionsHeading: 'Nhiệm vụ của bạn',
   missions: ['Đọc 4 bằng chứng', 'Trả lời 8 câu hỏi', 'Nộp bài và xem kết quả'],
   timerNote: 'Đồng hồ chỉ chạy khi bạn bắt đầu làm bài.',
@@ -41,6 +48,7 @@ export const CASE = {
 export const EVIDENCE = [
   {
     id: 'ev1',
+    image: 'evidence-1',
     tabLabel: '1. Tin nhắn lạ',
     title: 'Tin nhắn lạ',
     blocks: [
@@ -57,6 +65,7 @@ export const EVIDENCE = [
   },
   {
     id: 'ev2',
+    image: 'evidence-2',
     tabLabel: '2. Xác minh',
     title: 'Xác minh sau sự cố',
     blocks: [
@@ -77,6 +86,7 @@ export const EVIDENCE = [
   },
   {
     id: 'ev3',
+    image: 'evidence-3',
     tabLabel: '3. Mã OTP',
     title: 'Mã OTP',
     blocks: [
@@ -94,6 +104,7 @@ export const EVIDENCE = [
   },
   {
     id: 'ev4',
+    image: 'evidence-4',
     tabLabel: '4. Nhật ký',
     title: 'Nhật ký bảo mật',
     blocks: [

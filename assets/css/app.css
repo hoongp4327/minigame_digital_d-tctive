@@ -155,11 +155,14 @@ button { font: inherit; color: inherit; }
 .header-spacer { flex: 1 1 auto; }
 
 .file-tag {
+  display: inline-flex; align-items: center; gap: 7px;
   font-size: 13px; font-weight: 700; letter-spacing: .8px;
   padding: 6px 14px; border-radius: 999px;
   border: 1.5px solid rgba(255, 255, 255, .35);
   color: #fff; white-space: nowrap;
 }
+.file-tag .icon { color: var(--cyan); }
+.file-tag.is-submitted .icon { color: var(--navy); }
 .file-tag.is-submitted { background: var(--cyan); border-color: var(--cyan); color: var(--navy); }
 
 /* Đồng hồ + tiến độ trên header màn chơi */
@@ -192,10 +195,10 @@ button { font: inherit; color: inherit; }
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--surface);
   border: 1px solid var(--border);
   border-top: none;
   border-radius: 0 0 var(--r-lg) var(--r-lg);
+  background: var(--surface);
   margin-bottom: var(--s2);
   overflow: hidden;
   position: relative;
@@ -211,15 +214,6 @@ button { font: inherit; color: inherit; }
 @keyframes screen-in {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: none; }
-}
-
-/* Texture giấy chỉ ở vùng trang trí, 3–5% */
-.paper-tint {
-  background-color: var(--paper);
-  background-image:
-    linear-gradient(rgba(16, 36, 58, .035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(16, 36, 58, .035) 1px, transparent 1px);
-  background-size: 26px 26px;
 }
 
 /* ================================================================
@@ -262,22 +256,32 @@ button { font: inherit; color: inherit; }
 /* ================================================================
    5. Màn 1 — Chào mừng
    ================================================================ */
+/* Chữ nằm trọn trong khoảng trống bên trái của ảnh nền; cụm tang vật
+   trong ảnh chiếm khoảng 48% bên phải nên nội dung không được tràn qua. */
 .welcome {
   flex-direction: row;
-  align-items: stretch;
+  align-items: center;
+
+  /* Ảnh nền vụ án. Neo về bên PHẢI: ảnh gốc 16:9 còn khung máy là 4:3,
+     nên phần bị cắt rơi vào khoảng trống bên trái, không cắt mất cụm
+     tang vật (kẹp hồ sơ, robot, ổ khoá) nằm sát mép phải. */
+  background: url('../img/background-main.jpg') right center / cover no-repeat;
 }
 .welcome-copy {
-  flex: 0 0 55%;
+  flex: 0 0 auto;
+  width: min(52%, 600px);
   display: flex; flex-direction: column; justify-content: center;
-  padding: var(--s5) var(--s5) var(--s5) var(--s6);
+  padding: var(--s5) var(--s3) var(--s5) var(--s6);
   min-width: 0;
 }
-@media (max-width: 1100px) { .welcome-copy { padding: var(--s4) var(--s4) var(--s4) var(--s5); } }
+@media (max-width: 1100px) {
+  .welcome-copy { width: 50%; padding: var(--s4) var(--s2) var(--s4) var(--s5); }
+}
 
 .hero-title {
   font-size: var(--fs-hero);
   font-weight: 800;
-  line-height: 1.06;
+  line-height: 1.04;
   letter-spacing: -.5px;
   margin-bottom: var(--s3);
 }
@@ -285,40 +289,75 @@ button { font: inherit; color: inherit; }
 .hero-title .accent { color: var(--orange); }
 
 .hero-tagline {
-  font-size: var(--fs-lead);
-  color: var(--muted);
-  max-width: 30em;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: .2px;
+  text-transform: uppercase;
+  color: var(--navy);
+  max-width: 24em;
   margin-bottom: var(--s4);
 }
+@media (min-width: 1180px) { .hero-tagline { font-size: 16px; } }
 
-.chip-row { display: flex; flex-wrap: wrap; gap: var(--s2); margin-bottom: var(--s5); }
+/* ---- Ba chỉ số: số lớn trên, nhãn nhỏ dưới, ô icon có màu riêng ---- */
+/* Ba chip phải nằm gọn một hàng ở 1024px: ở đó chỉ còn ~451px cho cả
+   hàng, nên padding và ô icon được giữ chặt. */
+.chip-row {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin-bottom: var(--s5);
+  list-style: none;
+}
 .chip {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 9px 16px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--r-btn);
-  background: var(--surface);
-  font-size: 15px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 9px 15px 9px 9px;
+  border: 1px solid rgba(16, 36, 58, .08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 4px 14px rgba(16, 36, 58, .09);
   white-space: nowrap;
 }
-.chip .icon { color: var(--cyan-deep); }
-
-.hero-note { margin-top: var(--s4); font-size: 14px; color: var(--muted); }
-
-.welcome-art {
-  flex: 1 1 45%;
-  min-width: 0;
-  display: flex; align-items: center; justify-content: center;
-  padding: var(--s2);
-  border-left: 1px solid var(--border);
+.chip-icon {
+  display: grid; place-items: center;
+  width: 38px; height: 38px; flex: none;
+  border-radius: 11px;
 }
-.welcome-art img { width: 100%; max-width: 620px; height: auto; max-height: 100%; object-fit: contain; }
+.chip-icon.tone-orange { background: #FCE7DB; color: #E4581F; }
+.chip-icon.tone-blue   { background: #E0EBF9; color: #3579BE; }
+.chip-icon.tone-green  { background: #DCF1E5; color: #2F9D62; }
+
+.chip-text { display: flex; flex-direction: column; line-height: 1.15; }
+.chip-text b { font-size: 20px; font-weight: 800; color: var(--navy); }
+.chip-text small { font-size: 13px; font-weight: 600; color: var(--muted); }
+
+/* ---- Nút chính: mũi tên nằm trong đĩa tròn trắng ---- */
+.btn-cta {
+  gap: 14px;
+  padding: 8px 8px 8px 32px;
+  box-shadow: 0 8px 22px rgba(241, 106, 54, .34);
+}
+.btn-arrow {
+  display: grid; place-items: center;
+  width: 42px; height: 42px; flex: none;
+  border-radius: 50%;
+  background: #fff; color: var(--orange);
+}
+.btn-cta:hover .btn-arrow { color: #D8551F; }
+
+.hero-note {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: var(--s4);
+  font-size: 14px; color: var(--muted);
+}
+.hero-note .icon { flex: none; }
+
 
 /* ================================================================
    6. Màn 2 — Nhận vụ án
    ================================================================ */
 .briefing { flex-direction: row; }
 .briefing-left {
+  position: relative;
   flex: 1 1 56%;
   min-width: 0;
   display: flex; flex-direction: column;
@@ -331,6 +370,7 @@ button { font: inherit; color: inherit; }
   gap: var(--s4);
   padding: var(--s5) var(--s5) var(--s4) var(--s4);
   border-left: 1px solid var(--border);
+  background: #FBFDFF;
   min-width: 0;
 }
 @media (max-width: 1100px) {
@@ -338,7 +378,40 @@ button { font: inherit; color: inherit; }
   .briefing-right { padding: var(--s4); }
 }
 
+/* Hình minh họa vụ án, tràn hết đáy cột trái. Ảnh gốc vuông nên `cover`
+   sẽ cắt phần trên (giá sách, bảng ghim) và giữ lại cụm bàn học — đúng
+   khung hình cần thấy. Nằm dưới cùng để tờ ghi chú đè lên được. */
+.briefing-scene {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 66%;
+  z-index: 0;
+  pointer-events: none;
+  background: url('../img/background-2.jpg') center bottom / cover no-repeat;
+
+  /* Mép trên mờ dần để hình hoà vào nền giấy. Cần thiết vì khung cắt đổi
+     theo kích thước máy: không có lớp này thì ở 1024px ảnh bị cắt ngang
+     tấm bảng ghim thành một đường thẳng gắt. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 26%);
+}
+/* Chữ và tờ ghi chú luôn nằm trên hình minh họa. */
+.briefing-left > .screen-title,
+.briefing-left > .note-wrap { position: relative; z-index: 1; }
+
 .screen-title { font-size: var(--fs-screen-title); font-weight: 800; line-height: 1.2; }
+
+/* Hai nét vàng nhỏ cạnh tiêu đề, kiểu ghi chú tay */
+.has-spark { position: relative; display: inline-block; padding-right: 34px; }
+.has-spark::before,
+.has-spark::after {
+  content: '';
+  position: absolute; right: 8px;
+  width: 15px; height: 5px; border-radius: 3px;
+  background: #F6B93B;
+}
+.has-spark::before { top: 18%; transform: rotate(-38deg); }
+.has-spark::after { top: 42%; right: 2px; transform: rotate(-6deg); }
 
 .note-wrap { position: relative; margin-top: var(--s4); max-width: 560px; }
 .note-paper {
@@ -374,21 +447,49 @@ button { font: inherit; color: inherit; }
   border: 4px solid #C3CDD7; border-radius: 8px; border-bottom-color: transparent;
 }
 
-.briefing-props { margin-top: auto; padding-top: var(--s4); max-width: 420px; }
-.briefing-props img { width: 100%; height: auto; display: block; }
+/* ---- Tiêu đề "Nhiệm vụ của bạn": icon kẹp giấy + gạch chân vàng ---- */
+.missions-title {
+  display: flex; align-items: center; gap: 12px;
+}
+.missions-icon {
+  display: grid; place-items: center;
+  width: 42px; height: 42px; flex: none;
+  color: var(--orange);
+}
+.underlined { position: relative; }
+.underlined::after {
+  content: '';
+  position: absolute; left: 2px; right: 6px; bottom: -7px;
+  height: 5px; border-radius: 3px;
+  background: #F6B93B;
+  transform: rotate(-.7deg);
+}
 
-.mission-list { display: flex; flex-direction: column; gap: var(--s3); margin-top: var(--s3); }
+/* ---- Ba thẻ nhiệm vụ ---- */
+.mission-list {
+  display: flex; flex-direction: column; gap: 14px;
+  margin-top: var(--s4);
+  list-style: none;
+}
 .mission {
-  display: flex; align-items: center; gap: var(--s3);
-  font-size: var(--fs-lead); font-weight: 600;
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: #EAF3FC;
+  border: 1px solid #D8E8F7;
+  font-size: var(--fs-lead); font-weight: 700;
+  color: var(--navy);
 }
 .mission-badge {
-  flex: none; width: 52px; height: 52px; border-radius: 14px;
+  flex: none; width: 48px; height: 48px; border-radius: 13px;
   display: grid; place-items: center;
-  background: var(--cyan-tint); color: var(--navy);
-  border: 1.5px solid #BFECF3;
+  background: #fff; color: #2F6FA8;
+  box-shadow: 0 2px 6px rgba(16, 36, 58, .08);
 }
+.mission-text { flex: 1 1 auto; min-width: 0; }
 .mission-index { font-weight: 800; }
+/* Mũi tên chỉ là dấu trang trí — thẻ nhiệm vụ không bấm được. */
+.mission-chevron { flex: none; color: #8FB4D4; display: grid; place-items: center; }
 
 .timer-note {
   display: flex; align-items: center; gap: 10px;
@@ -396,6 +497,17 @@ button { font: inherit; color: inherit; }
 }
 .footnote { font-size: 14px; color: var(--muted); }
 .briefing-right .footnote { text-align: right; }
+.back-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--s2);
+}
+
+/* Cụm được gạch chân cam trên tờ ghi chú: hai mấu chốt của vụ án. */
+.note-paper em {
+  font-style: normal;
+  font-weight: 700;
+  box-shadow: inset 0 -3px 0 rgba(241, 106, 54, .55);
+}
 
 .back-row { margin-top: var(--s4); }
 
@@ -438,88 +550,30 @@ button { font: inherit; color: inherit; }
   box-shadow: 0 4px 12px rgba(241, 106, 54, .26);
 }
 
+/* Bằng chứng là ẢNH. Dùng `contain` chứ không phải `cover`: trong ảnh có
+   chữ mà học sinh phải đọc được (tên tài khoản, mã OTP, mốc giờ), cắt mép
+   là mất nội dung bài. Thà để dư khoảng trống còn hơn cắt mất chữ. */
 .evidence-card {
   flex: 1 1 auto;
   min-height: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  display: flex;
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   background: #FAFBFC;
-  padding: var(--s3) var(--s3) var(--s4);
+  padding: 0;
+  margin: 0;
 }
-.evidence-card-title {
-  font-size: 18px; font-weight: 800;
-  padding-bottom: var(--s2);
-  margin-bottom: var(--s3);
-  border-bottom: 1px solid var(--border);
+.evidence-card picture {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
 }
-.ev-lead { color: var(--muted); margin-bottom: var(--s3); }
-
-.ev-profile {
-  display: flex; align-items: center; gap: var(--s2);
-  padding: var(--s2) var(--s3);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  margin-bottom: var(--s2);
-}
-.ev-avatar {
-  flex: none; width: 48px; height: 48px; border-radius: 50%;
-  background: #E3E9EE; color: #8A9AA8;
-  display: grid; place-items: center;
-}
-.ev-profile-name { font-weight: 700; line-height: 1.3; }
-.ev-profile-handle {
-  font-size: 15px; color: var(--muted);
-  font-variant-ligatures: none;
-  word-break: break-all;
-}
-.ev-profile-meta { font-size: 14px; color: var(--muted); }
-
-.ev-message {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  border-top-left-radius: 4px;
-  padding: var(--s3);
-  line-height: 1.6;
-}
-.ev-typing { display: flex; gap: 5px; margin-top: var(--s2); }
-.ev-typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--border-strong); }
-
-.ev-list { display: flex; flex-direction: column; gap: var(--s2); }
-.ev-list li {
-  display: flex; gap: 10px;
-  padding: var(--s2) var(--s3);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  line-height: 1.55;
-}
-.ev-list li::before {
-  content: ''; flex: none;
-  width: 7px; height: 7px; margin-top: .62em;
-  border-radius: 50%; background: var(--cyan-deep);
-}
-
-.ev-log { display: flex; flex-direction: column; }
-.ev-log li {
-  display: flex; gap: var(--s3);
-  padding: var(--s2) 0 var(--s2) var(--s3);
-  border-left: 2px solid var(--border);
-  position: relative;
-  line-height: 1.55;
-}
-.ev-log li::before {
-  content: ''; position: absolute; left: -6px; top: 1.05em;
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--surface); border: 2.5px solid var(--cyan-deep);
-}
-.ev-log time {
-  flex: none; font-weight: 700; font-variant-numeric: tabular-nums;
-  color: var(--navy);
+.evidence-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 /* ---- Câu hỏi ---- */
@@ -630,12 +684,15 @@ button { font: inherit; color: inherit; }
 }
 .result-art {
   flex: 0 0 42%;
+  min-width: 0;
   display: flex; align-items: center; justify-content: center;
   padding: var(--s4);
   border-left: 1px solid var(--border);
-  min-width: 0;
 }
-.result-art img { width: 100%; max-width: 420px; height: auto; max-height: 100%; object-fit: contain; }
+.result-art img {
+  width: 100%; max-width: 420px; height: auto; max-height: 100%;
+  object-fit: contain;
+}
 @media (max-width: 1100px) {
   .result-main { padding: var(--s4); }
 }
@@ -832,14 +889,225 @@ button { font: inherit; color: inherit; }
 }
 
 /* ================================================================
-   13. prefers-reduced-motion
+   13. Chuyển động và chiều sâu
+
+   Chỉ chạm vào chuyển động của khối; thẻ bằng chứng, câu hỏi và đáp án
+   giữ nền sạch, tương phản cao — trẻ phải đọc được đề mới làm được bài.
+   ================================================================ */
+
+:root { --scan: rgba(84, 215, 229, .55); }
+
+/* ---------------- 13.1 Chuyển màn ---------------- */
+
+.app-main { perspective: 1400px; }
+
+.screen {
+  transform-origin: 50% 50%;
+  animation: screen-in-3d 380ms var(--ease) both;
+}
+@keyframes screen-in-3d {
+  from { opacity: 0; transform: translateZ(-140px) rotateX(7deg) translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Chip và nhiệm vụ nhảy vào lần lượt */
+.chip {
+  animation: pop-in 320ms var(--ease) both;
+  animation-delay: calc(240ms + var(--i, 0) * 80ms);
+}
+.mission {
+  animation: slide-in-3d 380ms var(--ease) both;
+  animation-delay: calc(140ms + var(--i, 0) * 90ms);
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(10px) scale(.94); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes slide-in-3d {
+  from { opacity: 0; transform: translateX(26px) rotateY(-14deg); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Giấy ghi chú nghiêng nhẹ trong không gian */
+.note-wrap { perspective: 900px; }
+.note-paper {
+  transform: rotateY(-2.2deg) rotateX(1.4deg);
+  animation: note-in 460ms var(--ease) both;
+}
+@keyframes note-in {
+  from { opacity: 0; transform: rotateY(-16deg) rotateX(6deg) translateZ(-60px); }
+  to   { opacity: 1; transform: rotateY(-2.2deg) rotateX(1.4deg); }
+}
+
+/* ---------------- 13.2 Thẻ bằng chứng lật 3D ---------------- */
+
+.evidence-card-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  perspective: 1200px;
+}
+.evidence-card {
+  flex: 1 1 auto;
+  animation: card-flip 420ms var(--ease) both;
+  transform-origin: 50% 50%;
+}
+@keyframes card-flip {
+  from { opacity: 0; transform: rotateY(-22deg) translateZ(-90px); }
+  to   { opacity: 1; transform: none; }
+}
+
+
+/* Tab bằng chứng: nhấc lên khi đang mở */
+.evidence-tab {
+  transform: translateZ(0);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+              color var(--dur) var(--ease), transform var(--dur) var(--ease),
+              box-shadow var(--dur) var(--ease);
+}
+.evidence-tab[aria-selected='true'] {
+  transform: translateY(-2px) scale(1.015);
+  box-shadow: 0 6px 16px rgba(241, 106, 54, .34), 0 0 0 1px rgba(241, 106, 54, .2);
+}
+
+/* ---------------- 13.3 Câu hỏi và đáp án ---------------- */
+
+.question-pane { perspective: 1100px; }
+.q-label, .q-prompt, .options {
+  animation: q-in 340ms var(--ease) both;
+}
+.q-prompt { animation-delay: 50ms; }
+.options  { animation-delay: 90ms; }
+@keyframes q-in {
+  from { opacity: 0; transform: translateX(22px) rotateY(9deg); }
+  to   { opacity: 1; transform: none; }
+}
+
+.option {
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
+  animation: opt-in 300ms var(--ease) both;
+  animation-delay: calc(120ms + var(--i, 0) * 70ms);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+              transform 140ms var(--ease), box-shadow var(--dur) var(--ease);
+}
+@keyframes opt-in {
+  from { opacity: 0; transform: translateY(12px) rotateX(-10deg); }
+  to   { opacity: 1; transform: none; }
+}
+.option:hover { transform: translateY(-2px); }
+.option:active { transform: translateY(1px) scale(.995); }
+.option[aria-checked='true'] {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(241, 106, 54, .22);
+}
+
+/* Vệt quét chạy qua đáp án vừa chọn — KHÔNG hàm ý đúng/sai */
+.option-scan {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(100deg, transparent 20%, var(--scan) 50%, transparent 80%);
+}
+.option.is-scanning .option-scan { animation: opt-scan 560ms var(--ease) 1; }
+@keyframes opt-scan {
+  0%   { opacity: 0; transform: translateX(-100%); }
+  25%  { opacity: .5; }
+  100% { opacity: 0; transform: translateX(100%); }
+}
+
+/* Dãy 1–8 nhấc lên ở câu đang xem */
+.q-nav-btn {
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+              transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.q-nav-btn.is-current {
+  transform: translateY(-3px) scale(1.06);
+  box-shadow: 0 6px 14px rgba(241, 106, 54, .3);
+}
+
+/* ---------------- 13.4 Đồng hồ ---------------- */
+
+.timer { font-variant-numeric: tabular-nums; }
+/* Dưới 60 giây: nhấp nháy rất nhẹ — đủ để chú ý, không gây giật */
+.timer.is-warning { animation: timer-pulse 1.1s ease-in-out infinite; }
+@keyframes timer-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(241, 106, 54, .5); }
+  50%      { box-shadow: 0 0 0 7px rgba(241, 106, 54, 0); }
+}
+
+/* ---------------- 13.5 Màn kết quả ---------------- */
+
+.result-main { perspective: 1000px; }
+
+.score-card {
+  position: relative;
+  overflow: hidden;
+  animation: score-in 520ms var(--ease) both;
+  animation-delay: 120ms;
+}
+@keyframes score-in {
+  from { opacity: 0; transform: rotateX(26deg) translateZ(-90px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Bốn góc ngắm kiểu màn hình phân tích */
+.score-frame { position: absolute; inset: 10px; pointer-events: none; }
+.score-corner { position: absolute; width: 16px; height: 16px; border: 2.5px solid var(--cyan-deep); opacity: .65; }
+.score-corner.tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+.score-corner.tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+.score-corner.bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+.score-corner.br { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+.score-value {
+  font-variant-numeric: tabular-nums;
+  transform-origin: 50% 50%;
+}
+.score-value.is-ticking { animation: score-tick 300ms var(--ease) 1; }
+@keyframes score-tick {
+  0%   { transform: rotateX(-70deg) scale(.9); opacity: .35; }
+  100% { transform: none; opacity: 1; }
+}
+
+.staff-banner {
+  animation: slide-in-3d 420ms var(--ease) both;
+  animation-delay: 420ms;
+}
+
+/* Lời giải: từng thẻ trượt vào */
+.review-item {
+  animation: slide-in-3d 320ms var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+/* ---------------- 13.6 Ăn mừng 8/8 ---------------- */
+
+.confetti i { animation-duration: 1600ms; }
+
+/* ================================================================
+   14. prefers-reduced-motion
+
+   Tắt toàn bộ lớp hiệu ứng ở mục 13, giữ nguyên bố cục và màu sắc.
+   Nút nhấn giữ vẫn phải chạy đủ 1,5 giây vì đó là cơ chế chống bấm
+   nhầm, không phải trang trí.
    ================================================================ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
     transition-duration: 1ms !important;
   }
   .hold-btn.is-holding .hold-fill { transition: width 1500ms linear !important; }
+
   .confetti { display: none; }
+
+  /* Bỏ mọi biến dạng 3D, đưa về phẳng */
+  .screen,
+  .note-paper,
+  .evidence-card { transform: none !important; }
+  .evidence-tab[aria-selected='true'],
+  .option[aria-checked='true'],
+  .q-nav-btn.is-current { transform: none !important; }
 }

@@ -67,6 +67,7 @@ src/
   session.js            nguồn state duy nhất: đồng hồ, chấm điểm, nộp, khôi phục
   storage.js            localStorage có namespace + xử lý hỏng/không ghi được
   app.js                điều phối màn hình, sự kiện, vòng lặp đồng hồ
+  effects.js            lớp hiệu ứng trang trí (mưa mã, nghiêng 3D, glitch…)
   icons.js              bộ icon inline dùng chung
   screens/
     welcome.js briefing.js game.js result.js   markup từng màn
@@ -89,7 +90,43 @@ Nguyên tắc đã áp dụng:
   `remaining = max(0, deadlineAt − Date.now())`. Không có biến đếm ngược nào là nguồn dữ liệu,
   nên chuyển tab, khóa máy, reload hay xoay màn hình đều không làm dừng giờ.
 - **Chấm đúng một lần** — `submit()` idempotent: vừa hết giờ vừa bấm nộp vẫn chỉ ra một kết quả.
-- **Chữ là HTML thật** — hình SVG chỉ chứa vật thể trang trí, không nhúng chữ chức năng.
+- **Bằng chứng là ảnh** — bốn thẻ bằng chứng hiển thị bằng ảnh minh họa, kèm bản chữ
+  ẩn cho trình đọc màn hình (xem 4.1). Chữ giao diện (đề bài, đáp án, nút) vẫn là HTML thật.
+
+### 4.1 Ảnh và cách tối ưu
+
+| File | Kích thước | Dung lượng | Dùng ở đâu |
+|---|---|---|---|
+| `background-main.jpg` | 1600×900 | 118 KB | Nền màn chào mừng |
+| `background-2.jpg` | 1100×1096 | 141 KB | Hình minh họa màn nhận vụ án |
+| `evidence-1..4.webp` | 1200×1200 | 129–147 KB | Bốn thẻ bằng chứng |
+| `evidence-1..4.jpg` | 1200×1200 | 168–202 KB | Bản dự phòng khi máy không đọc được WebP |
+
+Ảnh gốc gửi sang là PNG 2048×2048, mỗi tấm khoảng 6 MB (tổng 24 MB). Sau khi đổi cỡ
+và nén lại bằng ffmpeg, **toàn bộ thư mục ảnh còn 1,6 MB**.
+
+Muốn nén lại sau khi thay ảnh mới, chạy:
+
+```bash
+ffmpeg -i nguon.png -vf "scale=1200:-1:flags=lanczos" -c:v libwebp -quality 80 -compression_level 6 evidence-1.webp
+ffmpeg -i nguon.png -vf "scale=1200:-1:flags=lanczos" -c:v mjpeg -q:v 6 -huffman optimal evidence-1.jpg
+```
+
+Vài điểm đã cân nhắc:
+
+- **Vì sao có cả WebP lẫn JPEG.** Toàn bộ nội dung bằng chứng giờ nằm trong ảnh. Nếu chỉ
+  dùng WebP mà máy chạy iPadOS cũ hơn 14 thì ảnh không hiện, và học sinh **không có gì để
+  đọc mà làm bài**. `<picture>` tự chọn WebP khi máy đọc được, rơi về JPEG khi không.
+- **Service worker chỉ tải sẵn bản WebP.** Máy đời mới (gần như toàn bộ) vừa nhẹ vừa chạy
+  offline đầy đủ. Máy quá cũ sẽ tải JPEG qua mạng ở lần xem đầu rồi mới có bản offline —
+  người phụ trách nên bấm thử cả 4 thẻ một lượt lúc cài máy.
+- **Ảnh bằng chứng dùng `object-fit: contain`, không phải `cover`.** Trong ảnh có chữ học
+  sinh phải đọc (tên tài khoản, mã OTP, mốc giờ); `cover` sẽ cắt mép và mất nội dung bài.
+- **Mép trên hình màn nhận vụ án được làm mờ dần** (`mask-image`). Ảnh gốc vuông còn khung
+  hiển thị nằm ngang nên khung cắt đổi theo cỡ máy; không có lớp mờ này thì ở 1024px ảnh
+  bị cắt ngang tấm bảng ghim thành một đường thẳng rất gắt.
+- **Ảnh nền màn chào mừng neo về mép phải** — ảnh 16:9 còn màn iPad 4:3, neo phải khiến
+  phần bị cắt rơi vào khoảng trống bên trái, giữ nguyên cụm tang vật bên phải.
 
 ## 5. Nghiệm thu
 
@@ -133,7 +170,10 @@ Mở `http://localhost:4178/tools/acceptance.html`.
 | Giữ phím Enter / Space → cùng hành vi (thao tác tương đương bàn phím) | ĐẠT |
 | Xác nhận lượt mới → xóa phiên, về chào mừng, đồng hồ chưa chạy | ĐẠT |
 | Viewport dọc 768×1024 → hiện "Xoay iPad ngang để chơi", bài và đồng hồ vẫn giữ | ĐẠT |
-| Sau khi tải xong, chơi hết một lượt → **0 request mạng** | ĐẠT |
+| Sau khi tải xong, chơi hết một lượt → **0 request mạng** (kể cả với lớp hiệu ứng) | ĐẠT |
+| Mưa mã thực sự vẽ ra pixel (đo trực tiếp trên canvas) | ĐẠT |
+| Đổi màn nhiều vòng → số canvas và số interval về đúng mức cũ, không rò rỉ | ĐẠT |
+| Phiên biến mất giữa lượt → lùi về màn chào mừng thay vì kẹt màn trắng | ĐẠT |
 
 ### 5.3 Còn phải kiểm tra trên thiết bị thật trước khi bàn giao
 
@@ -146,6 +186,14 @@ Những mục này **chưa** được xác nhận và không thể xác nhận t
   hỗ trợ offline sau khi kiểm tra trên iPad thật**. Lưu ý app đã preload toàn bộ font và hình của
   cả 4 màn ngay lần tải đầu, nên kể cả khi service worker không hoạt động, mất mạng giữa lượt
   vẫn không ảnh hưởng tới lượt đang chơi — chỉ ảnh hưởng tới việc reload.
+- **Hiệu ứng nghiêng 3D theo con trỏ** (`mountTilt`) dùng `requestAnimationFrame`.
+  Môi trường xem trước khi phát triển không cấp frame cho rAF (đo được 0 tick/giây),
+  nên phần này chưa chạy thử được — cần mở trên máy thật để xác nhận. Các hiệu ứng
+  còn lại (mưa mã, glitch, lật thẻ, đếm điểm) đã kiểm tra chạy đúng.
+- **Nhịp khung hình trên iPad thật** với lớp hiệu ứng bật: mưa mã chạy 18fps trên hai
+  canvas nhỏ và chỉ animate `transform`/`opacity`, nhưng vẫn nên soát lại trên iPad
+  đời thấp nhất sẽ dùng tại gian hàng. Nếu giật, hạ `RAIN_FPS` trong `src/effects.js`
+  hoặc bỏ canvas ở header.
 - **Chụp ảnh nghiệm thu 4 màn** ở 1024×768, 1180×820 và 1440×900 để đính kèm hồ sơ bàn giao.
 - Kiểm tra bằng chuột và bàn phím trên desktop (focus rõ, radio có nhãn) — đã đúng về mặt
   markup (`role="radiogroup"`/`radio`, `aria-checked`, `aria-label` cho dãy 1–8, focus ring

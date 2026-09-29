@@ -13,21 +13,32 @@ export function renderWelcome() {
           <span class="accent">${line2}</span>
           <span class="accent">${line3}</span>
         </h1>
+
         <p class="hero-tagline">${CASE.tagline}</p>
+
         <ul class="chip-row">
           ${CASE.chips
-            .map((c, i) => `<li class="chip">${chipIcons[i](20)}${c}</li>`)
+            .map(
+              (c, i) => `
+            <li class="chip" style="--i:${i}">
+              <span class="chip-icon tone-${c.tone}" aria-hidden="true">${chipIcons[i](22)}</span>
+              <span class="chip-text">
+                <b>${c.value}</b>
+                <small>${c.label}</small>
+              </span>
+            </li>`
+            )
             .join('')}
         </ul>
+
         <div>
-          <button type="button" class="btn btn-primary btn-lg" data-act="start-briefing">
-            ${CASE.cta}${icon.arrowRight(22)}
+          <button type="button" class="btn btn-primary btn-lg btn-cta" data-act="start-briefing">
+            ${CASE.cta}
+            <span class="btn-arrow" aria-hidden="true">${icon.arrowRight(22)}</span>
           </button>
         </div>
-        <p class="hero-note">${CASE.note}</p>
-      </div>
-      <div class="welcome-art paper-tint" aria-hidden="true">
-        <img src="assets/img/hero.svg" alt="" width="620" height="560">
+
+        <p class="hero-note">${icon.lock(17)}${CASE.note}</p>
       </div>
     </section>`;
 }

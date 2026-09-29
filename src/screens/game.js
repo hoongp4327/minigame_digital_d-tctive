@@ -11,40 +11,36 @@ export function esc(s) {
 
 /* ---------------- Bằng chứng ---------------- */
 
-function renderBlock(block) {
-  switch (block.type) {
-    case 'lead':
-      return `<p class="ev-lead">${esc(block.text)}</p>`;
-
-    case 'profile':
-      return `
-        <div class="ev-profile">
-          <span class="ev-avatar" aria-hidden="true">${icon.users(26)}</span>
-          <span>
-            <span class="ev-profile-name">${esc(block.displayName)}</span><br>
-            <span class="ev-profile-handle">${esc(block.handle)}</span><br>
-            <span class="ev-profile-meta">${esc(block.meta)}</span>
-          </span>
-        </div>`;
-
-    case 'message':
-      return `
-        <div class="ev-message">
-          ${esc(block.text)}
-          <span class="ev-typing" aria-hidden="true"><i></i><i></i><i></i></span>
-        </div>`;
-
-    case 'list':
-      return `<ul class="ev-list">${block.items.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`;
-
-    case 'log':
-      return `<ul class="ev-log">${block.items
-        .map((e) => `<li><time>${esc(e.time)}</time><span>${esc(e.text)}</span></li>`)
-        .join('')}</ul>`;
-
-    default:
-      return '';
+/**
+ * Nội dung bằng chứng dưới dạng các dòng chữ thuần.
+ *
+ * Bằng chứng giờ hiển thị bằng ảnh, nên chữ trong `blocks` không còn được
+ * vẽ ra màn hình. Nhưng nó vẫn phải tồn tại trong DOM cho trình đọc màn
+ * hình và cho trường hợp ảnh không tải được — nếu không, phần nội dung
+ * cốt lõi của bài sẽ biến mất hoàn toàn với người dùng khiếm thị.
+ */
+function evidenceLines(ev) {
+  const lines = [];
+  for (const b of ev.blocks) {
+    switch (b.type) {
+      case 'lead':
+      case 'message':
+        lines.push(b.text);
+        break;
+      case 'profile':
+        lines.push(`${b.displayName} — ${b.handle} — ${b.meta}`);
+        break;
+      case 'list':
+        lines.push(...b.items);
+        break;
+      case 'log':
+        lines.push(...b.items.map((e) => `${e.time} — ${e.text}`));
+        break;
+      default:
+        break;
+    }
   }
+  return lines;
 }
 
 function renderEvidencePane(activeId) {
@@ -64,10 +60,21 @@ function renderEvidencePane(activeId) {
           </button>`
         ).join('')}
       </div>
-      <div class="evidence-card" id="evidence-card" role="tabpanel"
-           aria-labelledby="tab-${active.id}" tabindex="0">
-        <h3 class="evidence-card-title">${esc(active.title)}</h3>
-        ${active.blocks.map(renderBlock).join('')}
+      <div class="evidence-card-stage">
+        <figure class="evidence-card" id="evidence-card" role="tabpanel"
+                aria-labelledby="tab-${active.id}" tabindex="0">
+          <picture>
+            <source srcset="assets/img/${active.image}.webp" type="image/webp">
+            <img class="evidence-img" src="assets/img/${active.image}.jpg"
+                 width="1200" height="1200"
+                 alt="Bằng chứng ${EVIDENCE.indexOf(active) + 1}: ${esc(active.title)}">
+          </picture>
+          <figcaption class="visually-hidden">
+            ${evidenceLines(active)
+              .map((t) => `<p>${esc(t)}</p>`)
+              .join('')}
+          </figcaption>
+        </figure>
       </div>
     </div>`;
 }
@@ -93,11 +100,12 @@ function renderQuestionPane(session) {
       <div class="options" role="radiogroup" aria-labelledby="q-prompt" id="options">
         ${['A', 'B', 'C']
           .map(
-            (key) => `
-          <button type="button" class="option" role="radio"
+            (key, i) => `
+          <button type="button" class="option" role="radio" style="--i:${i}"
                   data-option="${key}" data-question="${q.id}"
                   aria-checked="${chosen === key}"
                   tabindex="${chosen === key || (!chosen && key === 'A') ? '0' : '-1'}">
+            <span class="option-scan" aria-hidden="true"></span>
             <span class="option-radio" aria-hidden="true"></span>
             <span class="option-key" aria-hidden="true">${key}.</span>
             <span class="option-text">${esc(q.options[key])}</span>

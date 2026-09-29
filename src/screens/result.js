@@ -19,7 +19,11 @@ export function renderResult(result) {
         }
 
         <div class="score-card">
-          <p class="score-value" aria-hidden="true">${result.score}/${result.total}</p>
+          <div class="score-frame" aria-hidden="true">
+            <span class="score-corner tl"></span><span class="score-corner tr"></span>
+            <span class="score-corner bl"></span><span class="score-corner br"></span>
+          </div>
+          <p class="score-value" id="score-value" aria-hidden="true">${result.score}/${result.total}</p>
           <p class="score-label">Câu trả lời đúng</p>
           <span class="visually-hidden">Bạn trả lời đúng ${result.score} trên ${result.total} câu.</span>
         </div>
@@ -46,7 +50,7 @@ export function renderResult(result) {
         </div>
       </div>
 
-      <div class="result-art paper-tint" aria-hidden="true">
+      <div class="result-art" aria-hidden="true">
         <img src="assets/img/result-props.svg" alt="" width="420" height="340">
       </div>
     </section>`;
@@ -80,7 +84,7 @@ export function renderReview(result) {
                  <dt>Bạn đã chọn</dt><dd>${given}. ${esc(q.options[given])}</dd>
                </div>`;
           return `
-            <article class="review-item">
+            <article class="review-item" style="--i:${i}">
               <header class="review-item-head">
                 <span class="review-num">Câu ${i + 1}</span>
                 <h3 class="review-q">${esc(q.prompt)}</h3>
