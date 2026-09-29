@@ -34,17 +34,25 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# CSS, JS và hình: cache 1 ngày, vẫn revalidate để sửa nội dung câu hỏi
-# không phải chờ lâu mới thấy trên iPad.
+# CSS, JS và hình: luôn hỏi lại máy chủ.
+#
+# Trước đây đặt max-age=86400: "must-revalidate" CHỈ có hiệu lực SAU khi hết
+# hạn, nên trong 24 giờ đầu trình duyệt lấy thẳng từ đĩa mà không hỏi gì —
+# sửa giao diện xong vẫn thấy bản cũ cả ngày. Tên file ở đây cố định
+# (app.css, evidence-1.webp...) nên không thể cache dài được.
+#
+# max-age=0 không có nghĩa là tải lại toàn bộ: trình duyệt gửi một request
+# điều kiện, file không đổi thì máy chủ trả 304 rỗng. Hơn nữa khi service
+# worker đã chạy thì phần lớn request này không ra tới mạng.
 [[headers]]
   for = "/assets/*"
   [headers.values]
-    Cache-Control = "public, max-age=86400, must-revalidate"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
   for = "/src/*"
   [headers.values]
-    Cache-Control = "public, max-age=86400, must-revalidate"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 # ---------------------------------------------------------------------------
 # Header chung

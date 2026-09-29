@@ -278,11 +278,14 @@ button { font: inherit; color: inherit; }
   .welcome-copy { width: 50%; padding: var(--s4) var(--s2) var(--s4) var(--s5); }
 }
 
+/* line-height phải rộng hơn chữ Latin vì tiếng Việt viết hoa có dấu chồng
+   tầng: Ế và Ấ đội thêm mũ trên dấu sắc, còn Ụ thả dấu nặng xuống dưới.
+   Ở 1.04 thì dấu nặng của "VỤ" đụng dấu huyền của "TÀI" ngay bên dưới. */
 .hero-title {
   font-size: var(--fs-hero);
   font-weight: 800;
-  line-height: 1.04;
-  letter-spacing: -.5px;
+  line-height: 1.18;
+  letter-spacing: -.2px;
   margin-bottom: var(--s3);
 }
 .hero-title span { display: block; }

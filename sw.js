@@ -2,14 +2,17 @@
  * Service worker cho chế độ gian hàng.
  *
  * Mục tiêu duy nhất: sau lần tải đầu thành công, app reload được khi mất mạng.
- * Chiến lược cache-first cho mọi tài nguyên đã precache — đồng thời đảm bảo
- * bản build KHÔNG tự đổi giữa lượt chơi: worker mới chỉ dọn cache cũ khi
- * được kích hoạt, và không gọi skipWaiting.
+ * Chiến lược cache-first cho mọi tài nguyên đã precache.
+ *
+ * Bản build KHÔNG được tự đổi giữa lượt chơi, nên worker mới không tự gọi
+ * skipWaiting. Thay vào đó nó nằm chờ cho tới khi trang chủ động nhắn
+ * SKIP_WAITING — trang chỉ nhắn lúc không có học sinh nào đang làm bài
+ * (xem đoạn đăng ký ở cuối index.html).
  *
  * Khi phát hành bản mới: tăng CACHE_VERSION.
  */
 
-const CACHE_VERSION = 'dd-v1.2.0';
+const CACHE_VERSION = 'dd-v1.3.0';
 
 const PRECACHE = [
   './',
@@ -66,6 +69,11 @@ self.addEventListener('install', (event) => {
       )
     )
   );
+});
+
+// Trang gọi khi thấy đã rảnh để thay bản mới. Không tự ý skipWaiting.
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {

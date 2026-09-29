@@ -53,12 +53,60 @@
 
   <script type="module" src="src/app.js"></script>
   <script>
-    // Service worker chỉ để chạy lại được khi mất mạng sau lần tải đầu thành công.
+    // Service worker để app chạy lại được khi mất mạng sau lần tải đầu.
+    //
+    // Phần dưới xử lý chuyện phát hành bản mới. Mặc định của service worker
+    // là bản mới nằm chờ cho tới khi ĐÓNG HẾT tab của trang — chỉ bấm tải
+    // lại thì vẫn thấy giao diện cũ. Ở gian hàng không ai đóng hết tab, nên
+    // phải chủ động thay.
+    //
+    // Nhưng cũng không được thay giữa lượt chơi, nên trang chỉ nhắn
+    // SKIP_WAITING khi không có học sinh nào đang làm bài.
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch((err) => {
+      window.addEventListener('load', async () => {
+        let reg;
+        try {
+          reg = await navigator.serviceWorker.register('sw.js');
+        } catch (err) {
           console.warn('[sw] không đăng ký được:', err);
+          return;
+        }
+
+        const dangLamBai = () => {
+          try {
+            return window.__dd && window.__dd.getView() === 'playing';
+          } catch (_) {
+            return false;
+          }
+        };
+
+        const thayKhiRanh = () => {
+          if (reg.waiting && !dangLamBai()) {
+            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          }
+        };
+
+        // Lần đầu cài đặt cũng phát controllerchange, nhưng lúc đó chưa có
+        // controller cũ nên không cần tải lại.
+        const daCoController = !!navigator.serviceWorker.controller;
+        let daTaiLai = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!daCoController || daTaiLai) return;
+          daTaiLai = true;
+          location.reload();
         });
+
+        reg.addEventListener('updatefound', () => {
+          const sw = reg.installing;
+          if (!sw) return;
+          sw.addEventListener('statechange', () => {
+            if (sw.state === 'installed') thayKhiRanh();
+          });
+        });
+
+        thayKhiRanh();
+        // Nếu lúc phát hiện bản mới có em đang làm bài thì chờ, nộp xong mới thay.
+        setInterval(thayKhiRanh, 10000);
       });
     }
   </script>
