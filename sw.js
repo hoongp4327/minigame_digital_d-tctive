@@ -12,7 +12,7 @@
  * Khi phát hành bản mới: tăng CACHE_VERSION.
  */
 
-const CACHE_VERSION = 'dd-v1.3.0';
+const CACHE_VERSION = 'dd-v1.4.0';
 
 const PRECACHE = [
   './',

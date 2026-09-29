@@ -10,7 +10,7 @@
  *  - Giữ nguyên thứ tự thẻ 1–4 và thứ tự câu 1–8, không đảo ngẫu nhiên ở v1.
  */
 
-export const CONTENT_VERSION = '1.0.0';
+export const CONTENT_VERSION = '1.1.0';
 export const CASE_ID = 'ho-so-01';
 export const DURATION_SECONDS = 300;
 
@@ -41,9 +41,13 @@ export const CASE = {
 };
 
 /**
- * Bốn bằng chứng theo thứ tự thẻ (KHÔNG phải thứ tự thời gian:
- * thẻ 2 là thông tin xác minh sau sự cố).
- * `blocks` là các khối hiển thị; type quyết định cách QuestionPanel render.
+ * Bốn bằng chứng theo thứ tự thẻ — trùng với trình tự thời gian của vụ án:
+ * 19:42 tin nhắn lạ → 20:14 mã OTP → 20:15–20:17 nhật ký → 20:20 xác minh.
+ *
+ * id, image và vị trí trong mảng luôn khớp nhau: thẻ số N là evN và dùng
+ * ảnh evidence-N. Đổi thứ tự thẻ thì phải đổi tên file ảnh theo.
+ * `blocks` không còn vẽ ra màn hình (bằng chứng hiển thị bằng ảnh) nhưng
+ * vẫn là bản chữ cho trình đọc màn hình — phải khớp nội dung trong ảnh.
  */
 export const EVIDENCE = [
   {
@@ -66,28 +70,7 @@ export const EVIDENCE = [
   {
     id: 'ev2',
     image: 'evidence-2',
-    tabLabel: '2. Xác minh',
-    title: 'Xác minh sau sự cố',
-    blocks: [
-      {
-        type: 'lead',
-        text: '20:20, sau khi mất quyền truy cập, Minh báo giáo viên. Giáo viên cùng Minh kiểm tra và xác nhận:'
-      },
-      {
-        type: 'list',
-        items: [
-          'Nhà trường không tổ chức cuộc thi Học đường số.',
-          'Giáo viên không gửi link bình chọn nào.',
-          'Nhà trường không yêu cầu học sinh đăng nhập tài khoản Câu lạc bộ để bình chọn.',
-          'Tin nhắn và đường link không phải do nhà trường gửi.'
-        ]
-      }
-    ]
-  },
-  {
-    id: 'ev3',
-    image: 'evidence-3',
-    tabLabel: '3. Mã OTP',
+    tabLabel: '2. Mã OTP',
     title: 'Mã OTP',
     blocks: [
       { type: 'lead', text: '20:14, điện thoại của Minh nhận tin:' },
@@ -103,9 +86,9 @@ export const EVIDENCE = [
     ]
   },
   {
-    id: 'ev4',
-    image: 'evidence-4',
-    tabLabel: '4. Nhật ký',
+    id: 'ev3',
+    image: 'evidence-3',
+    tabLabel: '3. Nhật ký',
     title: 'Nhật ký bảo mật',
     blocks: [
       {
@@ -115,6 +98,27 @@ export const EVIDENCE = [
           { time: '20:15', text: 'Email khôi phục bị thay đổi.' },
           { time: '20:16', text: 'Mật khẩu bị đổi; các phiên khác bị đăng xuất.' },
           { time: '20:17', text: 'Tài khoản gửi 38 tin nhắn có link bình chọn.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'ev4',
+    image: 'evidence-4',
+    tabLabel: '4. Xác minh',
+    title: 'Xác minh sau sự cố',
+    blocks: [
+      {
+        type: 'lead',
+        text: '20:20, sau khi mất quyền truy cập, Minh báo giáo viên. Giáo viên cùng Minh kiểm tra và xác nhận:'
+      },
+      {
+        type: 'list',
+        items: [
+          'Nhà trường không tổ chức cuộc thi Học đường số.',
+          'Giáo viên không gửi link bình chọn nào.',
+          'Nhà trường không yêu cầu học sinh đăng nhập tài khoản Câu lạc bộ để bình chọn.',
+          'Tin nhắn và đường link không phải do nhà trường gửi.'
         ]
       }
     ]

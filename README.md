@@ -160,7 +160,7 @@ Mở `http://localhost:4178/tools/acceptance.html`.
 |---|---|
 | 1024×768 — 4 tab bằng chứng, cả 3 đáp án, dãy 1–8 và thanh nút đều nhìn thấy | ĐẠT |
 | 1024×768 / 1180×820 / 1440×900 — không cuộn ngang, không cuộn dọc cả trang | ĐẠT |
-| Thẻ bằng chứng dài (thẻ 2) chỉ cuộn trong vùng thẻ | ĐẠT |
+| Bốn thẻ bằng chứng hiển thị đúng ảnh theo thứ tự 1 Tin nhắn · 2 OTP · 3 Nhật ký · 4 Xác minh | ĐẠT |
 | Câu 1 vô hiệu "Quay lại"; câu 8 không có "Câu tiếp", "Nộp bài" là CTA chính | ĐẠT |
 | Nộp khi thiếu câu → hộp thoại ghi đúng số câu trống; Hủy vẫn tiếp tục bài | ĐẠT |
 | Hết 300 giây khi hộp thoại đang mở → tự nộp một lần, đóng hộp thoại, vào kết quả | ĐẠT |
