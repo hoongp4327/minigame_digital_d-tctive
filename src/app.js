@@ -507,10 +507,17 @@ function bindEvents() {
   /* --- Nhấn giữ: chuột / cảm ứng --- */
   root.addEventListener('pointerdown', (e) => {
     const btn = e.target instanceof Element ? e.target.closest('[data-act="hold-reset"]') : null;
-    if (!btn) return;
+    if (!btn || e.button !== 0) return;
     e.preventDefault();
+    // Giữ con trỏ vào nút: ngón tay xê dịch vài pixel ra ngoài mép nút
+    // cũng không làm huỷ lượt giữ, chỉ nhấc tay lên mới huỷ.
+    try { btn.setPointerCapture(e.pointerId); } catch (_) { /* trình duyệt cũ */ }
     btn.focus();
     beginHold(btn);
+  });
+  // Nhấn lâu trên Android bật menu ngữ cảnh (Copy / Share...) và huỷ lượt giữ.
+  root.addEventListener('contextmenu', (e) => {
+    if (e.target instanceof Element && e.target.closest('[data-act="hold-reset"]')) e.preventDefault();
   });
   ['pointerup', 'pointercancel', 'pointerleave'].forEach((evt) =>
     root.addEventListener(evt, (e) => {

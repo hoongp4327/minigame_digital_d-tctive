@@ -751,7 +751,17 @@ button { font: inherit; color: inherit; }
 }
 
 /* Nút nhấn giữ 1,5 giây */
-.hold-btn { position: relative; overflow: hidden; width: 100%; }
+/* Nhấn lâu trên màn cảm ứng mặc định là CHỌN CHỮ và hiện menu Copy/Share.
+   Trình duyệt chuyển sang chọn chữ sau khoảng 0,5 giây, gửi pointercancel
+   và lượt giữ bị huỷ trước khi đủ 1,5 giây. Chặn cả ba đường:
+   user-select (chọn chữ), touch-callout (menu iOS), touch-action (cử chỉ). */
+.hold-btn {
+  position: relative; overflow: hidden; width: 100%;
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: none;
+}
+.hold-btn * { -webkit-user-select: none; user-select: none; }
 .hold-btn .hold-fill {
   position: absolute; inset: 0 auto 0 0;
   width: 0;
@@ -1113,4 +1123,116 @@ button { font: inherit; color: inherit; }
   .evidence-tab[aria-selected='true'],
   .option[aria-checked='true'],
   .q-nav-btn.is-current { transform: none !important; }
+}
+
+/* ================================================================
+   15. Màn hình thấp — máy tính bảng Android chạy trong trình duyệt
+
+   Máy 1280×800 mở trong Chrome chỉ còn khoảng 560–620px chiều cao, vì
+   thanh tab, thanh địa chỉ và thanh hệ thống ăn mất phần còn lại.
+   ================================================================ */
+
+/* Canh giữa an toàn. `justify-content: center` đẩy phần tràn ra CẢ HAI
+   đầu: tiêu đề bị cắt ở trên và không cuộn lên được. Dùng margin auto
+   thì khi đủ chỗ vẫn canh giữa, còn khi thiếu chỗ nội dung bắt đầu từ
+   trên và cuộn xuống được. */
+.welcome-copy,
+.briefing-right,
+.result-main { justify-content: flex-start; }
+.welcome-copy > :first-child,
+.briefing-right > :first-child,
+.result-main > :first-child { margin-top: auto; }
+.welcome-copy > :last-child,
+.briefing-right > :last-child,
+.result-main > :last-child { margin-bottom: auto; }
+.welcome-copy,
+.briefing-right { overflow-y: auto; }
+
+/* Không cho flex bóp các khối lại. Thẻ điểm có overflow: hidden nên khi
+   bị bóp, con số "4/8" bị cắt mất nửa. Thiếu chỗ thì cuộn, không bóp. */
+.welcome-copy > *,
+.briefing-right > *,
+.result-main > *,
+.briefing-left > .screen-title,
+.briefing-left > .note-wrap { flex-shrink: 0; }
+
+@media (max-height: 720px) {
+  :root {
+    --header-h: 52px;
+    --fs-hero: 40px;
+    --fs-screen-title: 24px;
+    --fs-question: 20px;
+    --fs-lead: 16px;
+  }
+  .app-header { margin-top: var(--s1); }
+  .app-main { margin-bottom: var(--s1); }
+  .brand img { width: 28px; height: 28px; }
+  .brand-name { font-size: 17px; }
+  .timer { padding: 5px 14px; font-size: 17px; }
+
+  /* Chào mừng */
+  .welcome-copy { padding-top: var(--s3); padding-bottom: var(--s3); }
+  .hero-title { margin-bottom: var(--s2); }
+  .hero-tagline { margin-bottom: var(--s3); }
+  .chip-row { margin-bottom: var(--s4); }
+  .hero-note { margin-top: var(--s3); }
+  .btn-lg { min-height: 52px; font-size: 18px; }
+
+  /* Nhận vụ án */
+  .briefing-left { padding-top: var(--s3); padding-bottom: var(--s3); }
+  .briefing-right { gap: var(--s2); padding-top: var(--s3); padding-bottom: var(--s3); }
+  .note-wrap { margin-top: var(--s3); }
+  .note-paper { padding-top: var(--s3); padding-bottom: var(--s3); line-height: 1.6; }
+  .mission-list { gap: 10px; margin-top: var(--s3); }
+  .mission { padding: 8px 14px; }
+  .mission-badge { width: 40px; height: 40px; border-radius: 11px; }
+  .back-row { margin-top: 0; }
+
+  /* Chơi */
+  .game { padding: var(--s3); gap: var(--s3); }
+  .pane-title { margin-bottom: var(--s1); }
+  .evidence-tabs { gap: var(--s1); margin-bottom: var(--s1); }
+  .evidence-tab { min-height: 44px; padding: 8px 14px; }
+  .q-prompt { margin-bottom: var(--s2); }
+  .options { gap: var(--s1); }
+  .option { min-height: 48px; padding: 8px var(--s3); }
+  .q-nav { margin-top: var(--s2); }
+  .q-nav-btn { width: 40px; height: 40px; }
+  .action-bar { padding-top: var(--s2); }
+  .action-bar .btn { min-height: 46px; padding: 10px 16px; }
+
+  /* Kết quả */
+  .result-main { padding-top: var(--s3); padding-bottom: var(--s3); }
+  .result-heading { margin-bottom: var(--s2); }
+  .timeout-note { margin-bottom: var(--s2); }
+  .score-card { padding: var(--s2) var(--s4); margin-bottom: var(--s2); }
+  .score-value { font-size: 56px; }
+  .score-label { font-size: 15px; }
+  .staff-banner { padding: 10px var(--s3); margin-bottom: var(--s2); }
+  .staff-zone { margin-top: var(--s2); padding-top: var(--s2); }
+  .review-head { padding: var(--s2) var(--s3); }
+  .review-body { padding: var(--s3); }
+}
+
+@media (max-height: 620px) {
+  :root {
+    --header-h: 48px;
+    --fs-hero: 36px;
+    --fs-screen-title: 22px;
+    --fs-question: 19px;
+  }
+  .chip-row { margin-bottom: var(--s3); }
+  .option { min-height: 44px; }
+  .q-nav-btn { width: 38px; height: 38px; font-size: 15px; }
+  .action-bar .btn { min-height: 44px; }
+  .score-value { font-size: 46px; }
+  .result-heading { font-size: 22px; }
+  #hold-hint { font-size: 13px; }
+}
+
+/* Chạm nhanh hoặc nhấn hơi lâu vào nút, đáp án, tab trên máy cảm ứng dễ
+   vô tình bôi chữ hoặc bật menu Copy. Chữ trên nút không cần chọn. */
+button {
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
 }
